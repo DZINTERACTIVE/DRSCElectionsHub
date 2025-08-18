@@ -6,7 +6,9 @@ document.addEventListener('DOMContentLoaded', () => {
     'TN':11,'TX':40,'UT':6,'VT':3,'VA':13,'WA':12,'WV':4,'WI':10,'WY':3
   };
 
-  const electionResults = {}; // all unassigned
+  // All states unassigned initially
+  const electionResults = {}; 
+
   const totals = { democrat:0, republican:0, undecided:0 };
   const totalVotes = Object.values(electoralVotes).reduce((a,b)=>a+b,0);
 
@@ -16,39 +18,50 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   totals.undecided = totalVotes - totals.democrat - totals.republican;
 
+  // Prepare data for Datamaps
+  const mapData = {};
+  for(const state in electoralVotes){
+    const party = electionResults[state] || 'unassigned';
+    mapData[state] = { fillKey: party.toUpperCase(), votes: electoralVotes[state] };
+  }
+
   const map = new Datamap({
     element: document.getElementById('map-container'),
     scope: 'usa',
-    responsive: true,
+    responsive:true,
     fills: { 'DEMOCRAT':'#2563eb','REPUBLICAN':'#dc2626','UNASSIGNED':'transparent','defaultFill':'transparent' },
-    data: {},
+    data: mapData,
     geographyConfig:{
-      popupTemplate:(geo)=>{
-        if(!geo.id) return '';
-        return `<div class="datamaps-hoverover"><strong>${geo.properties.name}</strong></div>`;
-      },
       borderColor:'#555',
-      highlightFillColor:'#333',
+      highlightFillColor:function(geo){
+        const state = geo.id;
+        if(mapData[state] && mapData[state].fillKey !== 'UNASSIGNED') return mapData[state].fillKey==='DEMOCRAT'?'#4f9efc':'#f16b6b';
+        return '#333';
+      },
       highlightBorderColor:'#fff',
       highlightBorderWidth:2,
-      highlightOnHover:true
-    },
-    setProjection: function(element){
-      const projection = d3.geo.albersUsa()
-        .translate([0,0])
-        .scale(1000);
-      const path = d3.geo.path().projection(projection);
-      return {path: path, projection: projection};
+      highlightOnHover:true,
+      popupTemplate:function(geo, data){
+        if(!data) return '';
+        return `<div class="datamaps-hoverover">
+                  <strong>${geo.properties.name}</strong><br/>
+                  Electoral Votes: ${data.votes}<br/>
+                  Party: ${data.fillKey==='UNASSIGNED'?'Undecided':data.fillKey.charAt(0)+data.fillKey.slice(1).toLowerCase()}
+                </div>`;
+      }
     }
   });
 
   // Remove default rect
   d3.select('#map-container svg rect').remove();
 
-  // Prevent states from staying highlighted
+  // Fix sticky hover highlight by forcing transparent fill on mouseout for unassigned
   map.svg.selectAll('.datamaps-subunit')
     .on('mouseout', function(d){
-      d3.select(this).style('fill','transparent');
+      const state = d.id;
+      if(mapData[state] && mapData[state].fillKey==='UNASSIGNED'){
+        d3.select(this).style('fill','transparent');
+      }
     });
 
   // Zoom & pan
