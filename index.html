@@ -1,39 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>US Electoral Map</title>
-<link rel="stylesheet" href="style.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/datamaps/0.5.9/datamaps.usa.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>US Electoral Map</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datamaps/0.5.9/datamaps.usa.min.js"></script>
 </head>
 <body>
-<div id="map-container"></div>
+    <div id="map-container"></div>
 
-<div id="results-overlay">
-    <div id="candidates">
-        <div class="candidate democrat">
-            <img src="democrat.jpg" alt="Democrat">
-            <p>Democrat</p>
-            <span id="democrat-votes">0</span>
+    <div id="results-overlay">
+        <div id="candidates">
+            <div class="candidate democrat">
+                <img src="democrat.jpg" alt="Democrat">
+                <p>Democrat</p>
+                <span id="democrat-votes">0</span>
+            </div>
+            <div class="line">
+                <span>270</span>
+            </div>
+            <div class="candidate republican">
+                <img src="republican.jpg" alt="Republican">
+                <p>Republican</p>
+                <span id="republican-votes">0</span>
+            </div>
         </div>
-        <div class="line">
-            <span>270</span>
-        </div>
-        <div class="candidate republican">
-            <img src="republican.jpg" alt="Republican">
-            <p>Republican</p>
-            <span id="republican-votes">0</span>
+        <div id="undecided-votes-container">
+            <p>Undecided Votes: <span id="undecided-votes">0</span></p>
         </div>
     </div>
-    <div id="undecided-votes-container">
-        <p>Undecided Votes: <span id="undecided-votes">0</span></p>
-    </div>
-</div>
 
-<script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
