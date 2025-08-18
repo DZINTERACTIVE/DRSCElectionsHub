@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ----------------------------
   const electionResults = {
     'AL':'republican',
-    'AK':'undecided',
+    'AK':'republican',
     'AZ':'lean-republican',
     'AR':'republican',
     'CA':'democrat',
