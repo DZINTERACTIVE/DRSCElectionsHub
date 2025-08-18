@@ -24,16 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Create tooltip div
   const tooltip = d3.select('body')
     .append('div')
-    .attr('id','tooltip')
-    .style('position','absolute')
-    .style('pointer-events','none')
-    .style('background','rgba(0,0,0,0.85)')
-    .style('color','#fff')
-    .style('padding','8px 12px')
-    .style('border-radius','6px')
-    .style('font-size','14px')
-    .style('font-weight','600')
-    .style('display','none');
+    .attr('id','tooltip');
 
   const map = new Datamap({
     element: document.getElementById('map-container'),
@@ -43,11 +34,11 @@ document.addEventListener('DOMContentLoaded', () => {
     data: mapData,
     geographyConfig:{
       borderColor:'#888',
-      highlightFillColor:'#444', // subtle highlight
+      highlightFillColor:'#444',
       highlightBorderColor:'#fff',
       highlightBorderWidth:2,
       highlightOnHover:true,
-      popupOnHover:false // we handle tooltip ourselves
+      popupOnHover:false
     }
   });
 
@@ -62,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     Electoral Votes: ${data.votes}<br/>
                     Party: ${data.fillKey==='UNASSIGNED'?'Undecided':data.fillKey.charAt(0)+data.fillKey.slice(1).toLowerCase()}`);
       if(data.fillKey==='UNASSIGNED'){
-        d3.select(this).style('fill','#666'); // subtle hover
+        d3.select(this).style('fill','#666');
       }
     })
     .on('mousemove', function(){
@@ -77,13 +68,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-  // Zoom & pan
   const zoom = d3.behavior.zoom()
     .scaleExtent([0.5,8])
     .on('zoom', ()=> map.svg.selectAll('g').attr('transform', `translate(${d3.event.translate})scale(${d3.event.scale})`));
   map.svg.call(zoom);
 
-  // Update vote bars
   const demPercent = totals.democrat/538*100;
   const repPercent = totals.republican/538*100;
 
