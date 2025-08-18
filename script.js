@@ -57,12 +57,13 @@ document.addEventListener('DOMContentLoaded', () => {
       popupOnHover:false
     },
     done: function(datamap){
-      // Add state abbreviations + EVs on top of each state
+      // Add state abbreviations + EVs attached to each state's <g> element
       datamap.svg.selectAll('.datamaps-subunit')
         .each(function(geo){
           const state = geo.id;
           const centroid = datamap.path.centroid(geo);
-          datamap.svg.append('text')
+          d3.select(this.parentNode) // attach text to same <g> as the state
+            .append('text')
             .attr('x', centroid[0])
             .attr('y', centroid[1])
             .attr('text-anchor','middle')
@@ -70,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .attr('fill','#fff')
             .attr('font-size','10px')
             .attr('pointer-events','none')
-            .text(`${state}\n${electoralVotes[state]}`);
+            .text(`${state} (${electoralVotes[state]})`);
         });
     }
   });
