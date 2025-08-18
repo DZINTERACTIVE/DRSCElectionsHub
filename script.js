@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     'TN':11,'TX':40,'UT':6,'VT':3,'VA':13,'WA':12,'WV':4,'WI':10,'WY':3
   };
 
-  const electionResults = {};
+  const electionResults = {}; // All unassigned
   const totals = { democrat:0, republican:0, undecided:0 };
   const totalVotes = Object.values(electoralVotes).reduce((a,b)=>a+b,0);
 
@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   totals.undecided = totalVotes - totals.democrat - totals.republican;
 
-  // Map
   const map = new Datamap({
     element: document.getElementById('map-container'),
     scope:'usa',
@@ -24,37 +23,24 @@ document.addEventListener('DOMContentLoaded', () => {
     fills:{ 'DEMOCRAT':'#2563eb','REPUBLICAN':'#dc2626','UNASSIGNED':'transparent','defaultFill':'transparent' },
     data:{},
     geographyConfig:{
-      popupTemplate:(geo,data)=>`<div class="datamaps-hoverover"><strong>${geo.properties.name}</strong></div>`,
+      popupTemplate:(geo)=>`<div class="datamaps-hoverover"><strong>${geo.properties.name}</strong></div>`,
       borderColor:'#555',
       highlightFillColor:'#333',
       highlightBorderColor:'#fff',
       highlightBorderWidth:2
     }
   });
+
+  // Remove default rectangle to keep full map visible
   d3.select('#map-container svg rect').remove();
 
-  // Zoom & Center
+  // Enable zoom & pan
   const zoom = d3.behavior.zoom()
     .scaleExtent([0.5,8])
     .on('zoom',()=>map.svg.selectAll('g').attr('transform',`translate(${d3.event.translate})scale(${d3.event.scale})`));
   map.svg.call(zoom);
 
-  function centerMap(){
-    const container=document.getElementById('map-container');
-    const usaGroup=map.svg.select('g.datamaps-subunits');
-    if(!usaGroup.empty()){
-      const bbox=usaGroup.node().getBBox();
-      const scale=Math.min(container.offsetWidth/bbox.width,container.offsetHeight/bbox.height)*0.9;
-      const tx=(container.offsetWidth-bbox.width*scale)/2-bbox.x*scale;
-      const ty=(container.offsetHeight-bbox.height*scale)/2-bbox.y*scale;
-      zoom.translate([tx,ty]).scale(scale);
-      map.svg.selectAll('g').attr('transform',`translate(${tx},${ty})scale(${scale})`);
-    }
-  }
-  setTimeout(centerMap,100);
-  window.addEventListener('resize',()=>map.resize());
-
-  // Update vote bars dynamically
+  // Update vote bars
   const demPercent = totals.democrat/538*100;
   const repPercent = totals.republican/538*100;
 
