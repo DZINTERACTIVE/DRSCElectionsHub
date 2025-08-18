@@ -21,11 +21,11 @@ html, body {
   fill:transparent;
   stroke:#555;
   stroke-width:1.5;
-  transition: fill 0.3s, stroke 0.3s;
+  transition: fill 0.2s, stroke 0.2s;
 }
 
 .datamaps-subunit:hover {
-  fill:#333; /* only highlight on real states */
+  fill:#333;
   stroke:#fff;
   cursor:pointer;
 }
@@ -70,15 +70,15 @@ html, body {
 }
 
 .candidate img {
-  width:80px;   /* bigger */
-  height:80px;
+  width:100px;   /* bigger */
+  height:100px;
   border-radius:50%;
   object-fit:cover;
   border:3px solid #fff;
 }
 
 .votes {
-  font-size:1.4em;  /* bigger text */
+  font-size:1.6em;  /* bigger text */
   font-weight:700;
 }
 
@@ -88,12 +88,12 @@ html, body {
 /* Vote bar bigger */
 #vote-bar {
   position:relative;
-  height:24px;  /* bigger */
+  height:36px;  /* much bigger */
   background:#333;
-  border-radius:12px;
+  border-radius:18px;
   overflow:hidden;
   flex:1;
-  margin:0 20px;
+  margin:0 25px;
 }
 
 #democrat-bar, #republican-bar {
@@ -105,4 +105,4 @@ html, body {
 #democrat-bar { left:0; background:#2563eb; width:0; }
 #republican-bar { right:0; background:#dc2626; width:0; }
 
-#undecided-votes { font-size:1.1em; font-weight:500; margin-top:6px; }
+#undecided-votes { font-size:1.2em; font-weight:500; margin-top:6px; }
