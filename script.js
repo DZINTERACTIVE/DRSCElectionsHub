@@ -20,17 +20,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const totals = { democrat:0, republican:0, undecided:0 };
   const totalVotes = Object.values(electoralVotes).reduce((a,b)=>a+b,0);
 
-  for(const state in electoralVotes){
-    const party = electionResults[state] || 'undecided';
-    totals[party] += electoralVotes[state];
-  }
-  totals.undecided = totalVotes - totals.democrat - totals.republican;
-
   const mapData = {};
   for(const state in electoralVotes){
     const party = electionResults[state] || 'undecided';
-    mapData[state] = { fillKey: party.toUpperCase(), votes:electoralVotes[state] };
+    totals[party] += electoralVotes[state];
+    mapData[state] = {
+      fillKey: party.toUpperCase(),  // MUST MATCH fills keys exactly
+      votes: electoralVotes[state],
+      party: party
+    };
   }
+  totals.undecided = totalVotes - totals.democrat - totals.republican;
 
   // Tooltip div
   const tooltip = d3.select('body')
@@ -41,7 +41,12 @@ document.addEventListener('DOMContentLoaded', () => {
     element: document.getElementById('map-container'),
     scope: 'usa',
     responsive:true,
-    fills: { 'DEMOCRAT':'#2563eb','REPUBLICAN':'#dc2626','UNDECIDED':'transparent','defaultFill':'transparent' },
+    fills: { 
+      'DEMOCRAT':'#2563eb',
+      'REPUBLICAN':'#dc2626',
+      'UNDECIDED':'transparent',
+      'defaultFill':'transparent' 
+    },
     data: mapData,
     geographyConfig:{
       borderColor:'#888',
@@ -62,8 +67,8 @@ document.addEventListener('DOMContentLoaded', () => {
       tooltip.style('display','block')
              .html(`<strong>${d.properties.name}</strong><br/>
                     Electoral Votes: ${data.votes}<br/>
-                    Party: ${data.fillKey==='UNDECIDED'?'Undecided':data.fillKey.charAt(0)+data.fillKey.slice(1).toLowerCase()}`);
-      if(data.fillKey==='UNDECIDED'){
+                    Party: ${data.party.charAt(0).toUpperCase()+data.party.slice(1)}`);
+      if(data.party==='undecided'){
         d3.select(this).style('fill','#444');
       }
     })
@@ -74,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
     .on('mouseout', function(d){
       tooltip.style('display','none');
       const state = d.id;
-      if(mapData[state].fillKey==='UNDECIDED'){
+      if(mapData[state].party==='undecided'){
         d3.select(this).style('fill','transparent');
       }
     });
