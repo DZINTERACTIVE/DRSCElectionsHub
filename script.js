@@ -6,25 +6,25 @@ document.addEventListener('DOMContentLoaded', () => {
         'TN':11,'TX':40,'UT':6,'VT':3,'VA':13,'WA':12,'WV':4,'WI':10,'WY':3
     };
 
-    // All states start unassigned
+    // initially no state is assigned
     const electionResults = {};
 
     const partyColors = {
-        democrat: '#3b82f6',
-        republican: '#ef4444',
-        undecided: '#9ca3af'
+        democrat: '#2563eb',
+        republican: '#dc2626',
+        undecided: '#6b7280'
     };
 
     const mapData = {};
     const totals = { democrat: 0, republican: 0, undecided: 0 };
-    const totalVotes = Object.values(electoralVotes).reduce((sum, v) => sum + v, 0);
+    const totalVotes = Object.values(electoralVotes).reduce((a,b)=>a+b,0);
 
-    for (const state in electoralVotes) {
+    for(const state in electoralVotes){
         const party = electionResults[state] || 'undecided';
         mapData[state] = { fillKey: 'UNASSIGNED', party, votes: electoralVotes[state] };
-        totals[party] += electoralVotes[state];
+        totals[party]+=electoralVotes[state];
     }
-    totals.undecided = totalVotes - totals.democrat - totals.republican;
+    totals.undecided = totalVotes-totals.democrat-totals.republican;
 
     const map = new Datamap({
         element: document.getElementById('map-container'),
@@ -38,16 +38,14 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         data: mapData,
         geographyConfig: {
-            popupTemplate: (geo, data) => `<div>${geo.properties.name}: ${data.party}</div>`,
-            borderColor: '#888',
-            highlightFillColor: (data) => data ? '#d1d5db' : 'transparent',
-            highlightBorderColor: '#555',
-            highlightBorderWidth: 2
+            popupTemplate: (geo,data)=>`<div>${geo.properties.name}: ${data.party}</div>`,
+            borderColor: '#cbd5e1',
+            highlightFillColor: (data)=>data?'#e2e8f0':'transparent',
+            highlightBorderColor: '#94a3b8',
+            highlightBorderWidth:2
         },
-        setProjection: function(element) {
-            const projection = d3.geo.albersUsa()
-                .scale(1000)
-                .translate([element.offsetWidth / 2, element.offsetHeight / 2]);
+        setProjection: el=>{
+            const projection = d3.geo.albersUsa().scale(1000).translate([el.offsetWidth/2,el.offsetHeight/2]);
             const path = d3.geo.path().projection(projection);
             return { path, projection };
         }
@@ -57,31 +55,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const zoom = d3.behavior.zoom()
         .scaleExtent([1,8])
-        .on('zoom', () => {
-            map.svg.selectAll('g').attr('transform', `translate(${d3.event.translate})scale(${d3.event.scale})`);
-        });
+        .on('zoom',()=>map.svg.selectAll('g').attr('transform',`translate(${d3.event.translate})scale(${d3.event.scale})`));
     map.svg.call(zoom);
 
-    function centerMap() {
+    function centerMap(){
         const container = document.getElementById('map-container');
         const usaGroup = map.svg.select('g.datamaps-subunits');
-        if (!usaGroup.empty()) {
+        if(!usaGroup.empty()){
             const bbox = usaGroup.node().getBBox();
-            const scale = Math.min(container.offsetWidth / bbox.width, container.offsetHeight / bbox.height) * 0.95;
-            const tx = (container.offsetWidth - bbox.width * scale)/2 - bbox.x*scale;
-            const ty = (container.offsetHeight - bbox.height*scale)/2 - bbox.y*scale;
+            const scale = Math.min(container.offsetWidth/bbox.width,container.offsetHeight/bbox.height)*0.95;
+            const tx = (container.offsetWidth-bbox.width*scale)/2 - bbox.x*scale;
+            const ty = (container.offsetHeight-bbox.height*scale)/2 - bbox.y*scale;
             zoom.translate([tx,ty]).scale(scale);
-            map.svg.selectAll('g').attr('transform', `translate(${tx},${ty})scale(${scale})`);
+            map.svg.selectAll('g').attr('transform',`translate(${tx},${ty})scale(${scale})`);
         }
     }
     setTimeout(centerMap,100);
-    window.addEventListener('resize', ()=>map.resize());
+    window.addEventListener('resize',()=>map.resize());
 
-    document.getElementById('democrat-votes').textContent = totals.democrat;
-    document.getElementById('republican-votes').textContent = totals.republican;
-    document.getElementById('undecided-votes').textContent = totals.undecided;
+    document.getElementById('democrat-votes').textContent=totals.democrat;
+    document.getElementById('republican-votes').textContent=totals.republican;
+    document.getElementById('undecided-votes').textContent=totals.undecided;
 
-    const winnerBanner = document.getElementById('winner-banner');
-    if(totals.democrat>=270){winnerBanner.innerHTML='<h2>Democrat Wins!</h2>'; winnerBanner.classList.add('democrat');}
-    else if(totals.republican>=270){winnerBanner.innerHTML='<h2>Republican Wins!</h2>'; winnerBanner.classList.add('republican');}
+    const winnerBanner=document.getElementById('winner-banner');
+    if(totals.democrat>=270){winnerBanner.innerHTML='<p>Democrat Wins!</p>'; winnerBanner.classList.add('democrat');}
+    else if(totals.republican>=270){winnerBanner.innerHTML='<p>Republican Wins!</p>'; winnerBanner.classList.add('republican');}
 });
