@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     'IL': 'democrat','IA': 'republican','NE': 'lean-republican','SD': 'republican',
     'ND': 'republican','MN': 'democrat','WI': 'lean-republican','MI': 'lean-republican',
     'CT': 'democrat','RI': 'democrat','MA': 'democrat','VT': 'democrat',
-    'NH': 'democrat','ME': 'lean-democrat','HI':'democrat','AK':'republican','KS':'republican'
+    'NH': 'democrat','ME': 'lean-democrat','HI':'democrat','AK':'republican','KS':'republican','MO':'lean-republican'
   };
 
   const totals = { democrat:0, republican:0, undecided:0 };
@@ -55,6 +55,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Add state abbreviations + EVs
+  map.svg.selectAll('.datamaps-subunit')
+     .each(function(d){
+       const center = d3.select(this).node().getBBox();
+       map.svg.append('text')
+          .attr('class','state-label')
+          .attr('x', center.x + center.width/2)
+          .attr('y', center.y + center.height/2)
+          .text(d.id + ' (' + electoralVotes[d.id] + ')');
+     });
+
+  // Tooltip hover
   map.svg.selectAll('.datamaps-subunit')
     .on('mouseover', function(d){
       const state = d.id;
@@ -64,26 +76,4 @@ document.addEventListener('DOMContentLoaded', () => {
                     Electoral Votes: ${data.votes}<br/>
                     Party: ${data.party.replace('lean-','').charAt(0).toUpperCase() +
                             data.party.replace('lean-','').slice(1)}${data.party.startsWith('lean-') ? ' (Lean)' : ''}`);
-      if(data.party==='undecided') d3.select(this).style('fill','#666');
-    })
-    .on('mousemove', function(){
-      tooltip.style('top', (d3.event.pageY + 15) + 'px')
-             .style('left', (d3.event.pageX + 15) + 'px');
-    })
-    .on('mouseout', function(d){
-      tooltip.style('display','none');
-      const state = d.id;
-      if(mapData[state].party==='undecided') d3.select(this).style('fill','transparent');
-    });
-
-  const zoom = d3.behavior.zoom()
-    .scaleExtent([0.5,8])
-    .on('zoom', ()=> map.svg.selectAll('g').attr('transform', `translate(${d3.event.translate})scale(${d3.event.scale})`));
-  map.svg.call(zoom);
-
-  const demPercent = totals.democrat/538*100;
-  const repPercent = totals.republican/538*100;
-
-  document.getElementById('democrat-bar').style.width = demPercent + '%';
-  document.getElementById('republican-bar').style.width = repPercent + '%';
-});
+      if(data.party==='undecided') d3.sele
