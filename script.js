@@ -77,16 +77,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
   const zoom = d3.behavior.zoom()
-    .scaleExtent([0.3,8])
+    .scaleExtent([0.5,8])
     .on('zoom', ()=> map.svg.selectAll('g').attr('transform', `translate(${d3.event.translate})scale(${d3.event.scale})`));
   map.svg.call(zoom);
 
   const demPercent = totals.democrat/538*100;
   const repPercent = totals.republican/538*100;
-
-  document.getElementById('democrat-votes').textContent = totals.democrat;
-  document.getElementById('republican-votes').textContent = totals.republican;
-  document.getElementById('undecided-votes').textContent = totals.undecided;
 
   document.getElementById('democrat-bar').style.width = demPercent + '%';
   document.getElementById('republican-bar').style.width = repPercent + '%';
