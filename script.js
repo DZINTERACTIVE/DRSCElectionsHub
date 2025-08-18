@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'TN':11,'TX':40,'UT':6,'VT':3,'VA':13,'WA':12,'WV':4,'WI':10,'WY':3
     };
 
-    const electionResults = {}; // no state assigned initially
+    const electionResults = {}; // unassigned initially
     const partyColors = { democrat:'#2563eb', republican:'#dc2626', undecided:'#6b7280' };
 
     const mapData = {};
@@ -16,14 +16,14 @@ document.addEventListener('DOMContentLoaded', () => {
     for(const state in electoralVotes){
         const party = electionResults[state] || 'undecided';
         mapData[state] = { fillKey:'UNASSIGNED', party, votes:electoralVotes[state] };
-        totals[party] += electoralVotes[state];
+        totals[party]+=electoralVotes[state];
     }
     totals.undecided = totalVotes-totals.democrat-totals.republican;
 
     const map = new Datamap({
         element: document.getElementById('map-container'),
         scope: 'usa',
-        responsive: true,
+        responsive:true,
         fills:{
             'DEMOCRAT': partyColors.democrat,
             'REPUBLICAN': partyColors.republican,
@@ -32,27 +32,27 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         data: mapData,
         geographyConfig:{
-            popupTemplate: (geo,data)=> 
+            popupTemplate:(geo,data)=>
                 `<div class="datamaps-hoverover">
                     <strong>${geo.properties.name}</strong><br/>
                     Party: ${data.party.charAt(0).toUpperCase()+data.party.slice(1)}<br/>
                     Electoral Votes: ${data.votes}
                 </div>`,
-            borderColor:'#cbd5e1',
-            highlightFillColor:(data)=>'#f3f4f6',
-            highlightBorderColor:'#6b7280',
+            borderColor:'#444',
+            highlightFillColor:(data)=>'#333',
+            highlightBorderColor:'#fff',
             highlightBorderWidth:2
         },
-        setProjection: el=>{
-            const projection = d3.geo.albersUsa().scale(1000).translate([el.offsetWidth/2, el.offsetHeight/2]);
-            const path = d3.geo.path().projection(projection);
+        setProjection:el=>{
+            const projection=d3.geo.albersUsa().scale(1000).translate([el.offsetWidth/2,el.offsetHeight/2]);
+            const path=d3.geo.path().projection(projection);
             return { path, projection };
         }
     });
 
     d3.select('#map-container svg rect').remove();
 
-    const zoom = d3.behavior.zoom()
+    const zoom=d3.behavior.zoom()
         .scaleExtent([1,8])
         .on('zoom',()=>map.svg.selectAll('g').attr('transform',`translate(${d3.event.translate})scale(${d3.event.scale})`));
     map.svg.call(zoom);
@@ -75,8 +75,4 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('democrat-votes').textContent=totals.democrat;
     document.getElementById('republican-votes').textContent=totals.republican;
     document.getElementById('undecided-votes').textContent=totals.undecided;
-
-    const winnerBanner=document.getElementById('winner-banner');
-    if(totals.democrat>=270){winnerBanner.innerHTML='<p>Democrat Wins!</p>'; winnerBanner.classList.add('democrat');}
-    else if(totals.republican>=270){winnerBanner.innerHTML='<p>Republican Wins!</p>'; winnerBanner.classList.add('republican');}
 });
