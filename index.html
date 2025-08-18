@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>US Electoral Map</title>
+<title>Interactive Electoral Map</title>
 <link rel="stylesheet" href="style.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
@@ -13,25 +13,26 @@
 <body>
 <div id="map-container"></div>
 
+<!-- Overlay that mimics NYT/AP style -->
 <div id="results-overlay">
-  <div id="vote-bar-container">
+  <div id="vote-bar-wrapper">
     <div class="candidate democrat">
       <img src="democrat.jpg" alt="Democrat">
-      <span id="democrat-votes">0</span>
+      <div class="votes" id="democrat-votes">0</div>
     </div>
+
     <div id="vote-bar">
       <div id="democrat-bar"></div>
       <div id="republican-bar"></div>
       <div id="target-line">270</div>
     </div>
+
     <div class="candidate republican">
       <img src="republican.jpg" alt="Republican">
-      <span id="republican-votes">0</span>
+      <div class="votes" id="republican-votes">0</div>
     </div>
   </div>
-  <div id="undecided-votes-container">
-    <p>Undecided Votes: <span id="undecided-votes">0</span></p>
-  </div>
+  <div id="undecided-votes">Undecided: 0</div>
 </div>
 
 <script src="script.js"></script>
