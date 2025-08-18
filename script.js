@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'DEMOCRAT': partyColors.democrat,
             'REPUBLICAN': partyColors.republican,
             'UNDECIDED': partyColors.undecided,
-            'defaultFill': '#555'
+            'defaultFill': 'transparent' // no black background
         },
         data: mapData,
         geographyConfig: {
