@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'WI': 10,'WY': 3
     };
 
-    // Editable: assign states to parties
+    // Assign states to parties: 'democrat', 'republican', or leave undefined for undecided
     const electionResults = {
         'CA': 'democrat',
         'TX': 'republican',
@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'DEMOCRAT': partyColors.democrat,
             'REPUBLICAN': partyColors.republican,
             'UNDECIDED': partyColors.undecided,
-            'defaultFill': 'transparent' // no black background
+            'defaultFill': 'transparent' // removes black rectangle
         },
         data: mapData,
         geographyConfig: {
@@ -51,6 +51,14 @@ document.addEventListener('DOMContentLoaded', () => {
             highlightFillColor: (data) => mapData[data.id] ? partyColors[mapData[data.id].party] : partyColors.undecided,
             highlightBorderColor: '#fff',
             highlightBorderWidth: 2
+        },
+        // Prevent Datamaps from drawing a black rectangle background
+        setProjection: function(element) {
+            var projection = d3.geo.albersUsa()
+                .scale(1000)
+                .translate([element.offsetWidth / 2, element.offsetHeight / 2]);
+            var path = d3.geo.path().projection(projection);
+            return { path: path, projection: projection };
         }
     });
 
