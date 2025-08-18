@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const usaGroup=map.svg.select('g.datamaps-subunits');
     if(!usaGroup.empty()){
       const bbox=usaGroup.node().getBBox();
-      const scale=Math.min(container.offsetWidth/bbox.width,container.offsetHeight/bbox.height)*0.8;
+      const scale=Math.min(container.offsetWidth/bbox.width,container.offsetHeight/bbox.height)*0.9;
       const tx=(container.offsetWidth-bbox.width*scale)/2-bbox.x*scale;
       const ty=(container.offsetHeight-bbox.height*scale)/2-bbox.y*scale;
       zoom.translate([tx,ty]).scale(scale);
