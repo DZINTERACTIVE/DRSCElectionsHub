@@ -6,17 +6,13 @@ document.addEventListener('DOMContentLoaded', () => {
         'TN':11,'TX':40,'UT':6,'VT':3,'VA':13,'WA':12,'WV':4,'WI':10,'WY':3
     };
 
-    // Assign parties: 'democrat', 'republican', or undefined for undecided
-    const electionResults = {
-        'CA': 'democrat',
-        'TX': 'republican',
-        'FL': 'undecided'
-    };
+    // All states start unassigned
+    const electionResults = {};
 
     const partyColors = {
         democrat: '#3b82f6',
         republican: '#ef4444',
-        undecided: '#a8a29e'
+        undecided: '#9ca3af'
     };
 
     const mapData = {};
@@ -25,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     for (const state in electoralVotes) {
         const party = electionResults[state] || 'undecided';
-        mapData[state] = { fillKey: party.toUpperCase(), party, votes: electoralVotes[state] };
+        mapData[state] = { fillKey: 'UNASSIGNED', party, votes: electoralVotes[state] };
         totals[party] += electoralVotes[state];
     }
     totals.undecided = totalVotes - totals.democrat - totals.republican;
@@ -37,13 +33,16 @@ document.addEventListener('DOMContentLoaded', () => {
         fills: {
             'DEMOCRAT': partyColors.democrat,
             'REPUBLICAN': partyColors.republican,
-            'UNDECIDED': partyColors.undecided,
+            'UNASSIGNED': 'transparent',
             'defaultFill': 'transparent'
         },
         data: mapData,
         geographyConfig: {
             popupTemplate: (geo, data) => `<div>${geo.properties.name}: ${data.party}</div>`,
-            borderColor: '#000'
+            borderColor: '#888',
+            highlightFillColor: (data) => data ? '#d1d5db' : 'transparent',
+            highlightBorderColor: '#555',
+            highlightBorderWidth: 2
         },
         setProjection: function(element) {
             const projection = d3.geo.albersUsa()
@@ -54,10 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // REMOVE THE BLACK RECTANGLE DATAMAPS CREATES
     d3.select('#map-container svg rect').remove();
 
-    // Zoom & pan
     const zoom = d3.behavior.zoom()
         .scaleExtent([1,8])
         .on('zoom', () => {
@@ -80,7 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(centerMap,100);
     window.addEventListener('resize', ()=>map.resize());
 
-    // Update vote totals
     document.getElementById('democrat-votes').textContent = totals.democrat;
     document.getElementById('republican-votes').textContent = totals.republican;
     document.getElementById('undecided-votes').textContent = totals.undecided;
