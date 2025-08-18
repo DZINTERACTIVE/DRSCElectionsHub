@@ -7,14 +7,16 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // ----------------------------
-  // Assign states to parties here
+  // Set states and leans here
   // ----------------------------
   const electionResults = {
-    'CA':'democrat',
-    'NY':'democrat',
-    'TX':'republican',
-    'FL':'republican',
-    'GA':'undecided'
+    'CA': 'democrat',
+    'NY': 'democrat',
+    'TX': 'republican',
+    'FL': 'republican',
+    'GA': 'lean-democrat',
+    'NC': 'lean-republican',
+    'AZ': 'undecided'
   };
 
   const totals = { democrat:0, republican:0, undecided:0 };
@@ -23,9 +25,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const mapData = {};
   for(const state in electoralVotes){
     const party = electionResults[state] || 'undecided';
-    totals[party] += electoralVotes[state];
+    const mainParty = party.replace('lean-','');
+    totals[mainParty] += electoralVotes[state];
     mapData[state] = {
-      fillKey: party.toUpperCase(),  // MUST MATCH fills keys exactly
+      fillKey: party.toUpperCase(),
       votes: electoralVotes[state],
       party: party
     };
@@ -44,6 +47,8 @@ document.addEventListener('DOMContentLoaded', () => {
     fills: { 
       'DEMOCRAT':'#2563eb',
       'REPUBLICAN':'#dc2626',
+      'LEAN-DEMOCRAT':'#93c5fd',
+      'LEAN-REPUBLICAN':'#fca5a5',
       'UNDECIDED':'transparent',
       'defaultFill':'transparent' 
     },
@@ -58,8 +63,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  d3.select('#map-container svg rect').remove();
-
   map.svg.selectAll('.datamaps-subunit')
     .on('mouseover', function(d){
       const state = d.id;
@@ -67,7 +70,8 @@ document.addEventListener('DOMContentLoaded', () => {
       tooltip.style('display','block')
              .html(`<strong>${d.properties.name}</strong><br/>
                     Electoral Votes: ${data.votes}<br/>
-                    Party: ${data.party.charAt(0).toUpperCase()+data.party.slice(1)}`);
+                    Party: ${data.party.replace('lean-','').charAt(0).toUpperCase() + 
+                            data.party.replace('lean-','').slice(1)}${data.party.startsWith('lean-') ? ' (Lean)' : ''}`);
       if(data.party==='undecided'){
         d3.select(this).style('fill','#444');
       }
