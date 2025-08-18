@@ -6,9 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     'TN':11,'TX':40,'UT':6,'VT':3,'VA':13,'WA':12,'WV':4,'WI':10,'WY':3
   };
 
-  // All states unassigned initially
-  const electionResults = {}; 
-
+  const electionResults = {}; // all unassigned
   const totals = { democrat:0, republican:0, undecided:0 };
   const totalVotes = Object.values(electoralVotes).reduce((a,b)=>a+b,0);
 
@@ -18,12 +16,24 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   totals.undecided = totalVotes - totals.democrat - totals.republican;
 
-  // Prepare data for Datamaps
   const mapData = {};
   for(const state in electoralVotes){
-    const party = electionResults[state] || 'unassigned';
-    mapData[state] = { fillKey: party.toUpperCase(), votes: electoralVotes[state] };
+    mapData[state] = { fillKey:'UNASSIGNED', votes:electoralVotes[state] };
   }
+
+  // Create tooltip div
+  const tooltip = d3.select('body')
+    .append('div')
+    .attr('id','tooltip')
+    .style('position','absolute')
+    .style('pointer-events','none')
+    .style('background','rgba(0,0,0,0.85)')
+    .style('color','#fff')
+    .style('padding','8px 12px')
+    .style('border-radius','6px')
+    .style('font-size','14px')
+    .style('font-weight','600')
+    .style('display','none');
 
   const map = new Datamap({
     element: document.getElementById('map-container'),
@@ -32,34 +42,37 @@ document.addEventListener('DOMContentLoaded', () => {
     fills: { 'DEMOCRAT':'#2563eb','REPUBLICAN':'#dc2626','UNASSIGNED':'transparent','defaultFill':'transparent' },
     data: mapData,
     geographyConfig:{
-      borderColor:'#555',
-      highlightFillColor:function(geo){
-        const state = geo.id;
-        if(mapData[state] && mapData[state].fillKey !== 'UNASSIGNED') return mapData[state].fillKey==='DEMOCRAT'?'#4f9efc':'#f16b6b';
-        return '#333';
-      },
+      borderColor:'#888',
+      highlightFillColor:'#444', // subtle highlight
       highlightBorderColor:'#fff',
       highlightBorderWidth:2,
       highlightOnHover:true,
-      popupTemplate:function(geo, data){
-        if(!data) return '';
-        return `<div class="datamaps-hoverover">
-                  <strong>${geo.properties.name}</strong><br/>
-                  Electoral Votes: ${data.votes}<br/>
-                  Party: ${data.fillKey==='UNASSIGNED'?'Undecided':data.fillKey.charAt(0)+data.fillKey.slice(1).toLowerCase()}
-                </div>`;
-      }
+      popupOnHover:false // we handle tooltip ourselves
     }
   });
 
-  // Remove default rect
   d3.select('#map-container svg rect').remove();
 
-  // Fix sticky hover highlight by forcing transparent fill on mouseout for unassigned
   map.svg.selectAll('.datamaps-subunit')
-    .on('mouseout', function(d){
+    .on('mouseover', function(d){
       const state = d.id;
-      if(mapData[state] && mapData[state].fillKey==='UNASSIGNED'){
+      const data = mapData[state];
+      tooltip.style('display','block')
+             .html(`<strong>${d.properties.name}</strong><br/>
+                    Electoral Votes: ${data.votes}<br/>
+                    Party: ${data.fillKey==='UNASSIGNED'?'Undecided':data.fillKey.charAt(0)+data.fillKey.slice(1).toLowerCase()}`);
+      if(data.fillKey==='UNASSIGNED'){
+        d3.select(this).style('fill','#666'); // subtle hover
+      }
+    })
+    .on('mousemove', function(){
+      tooltip.style('top', (d3.event.pageY + 15) + 'px')
+             .style('left', (d3.event.pageX + 15) + 'px');
+    })
+    .on('mouseout', function(d){
+      tooltip.style('display','none');
+      const state = d.id;
+      if(mapData[state].fillKey==='UNASSIGNED'){
         d3.select(this).style('fill','transparent');
       }
     });
