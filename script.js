@@ -7,18 +7,16 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const electionResults = {
-    'CA': 'democrat','NY': 'democrat','TX': 'republican','FL': 'republican',
-    'GA': 'lean-democrat','NC': 'lean-republican','AZ': 'lean-republican','NM': 'democrat',
-    'CO': 'democrat','UT': 'republican','NV': 'lean-republican','ID': 'republican',
-    'WA': 'democrat','OR': 'democrat','WY': 'republican','MT': 'republican',
-    'OK': 'republican','AR': 'republican','LA': 'republican','MS': 'republican',
-    'AL': 'republican','TN': 'republican','SC': 'republican','KY': 'republican',
-    'VA': 'lean-democrat','WV': 'republican','MD': 'democrat','DE': 'democrat',
-    'NJ': 'lean-democrat','PA': 'lean-republican','OH': 'republican','IN': 'republican',
-    'IL': 'democrat','IA': 'republican','NE': 'lean-republican','SD': 'republican',
-    'ND': 'republican','MN': 'democrat','WI': 'lean-republican','MI': 'lean-republican',
-    'CT': 'democrat','RI': 'democrat','MA': 'democrat','VT': 'democrat',
-    'NH': 'democrat','ME': 'lean-democrat','HI':'democrat','AK':'republican','KS':'republican','MO':'lean-republican'
+    'CA':'democrat','NY':'democrat','TX':'republican','FL':'republican','GA':'lean-democrat',
+    'NC':'lean-republican','AZ':'lean-republican','NM':'democrat','CO':'democrat','UT':'republican',
+    'NV':'lean-republican','ID':'republican','WA':'democrat','OR':'democrat','WY':'republican',
+    'MT':'republican','OK':'republican','AR':'republican','LA':'republican','MS':'republican',
+    'AL':'republican','TN':'republican','SC':'republican','KY':'republican','VA':'lean-democrat',
+    'WV':'republican','MD':'democrat','DE':'democrat','NJ':'lean-democrat','PA':'lean-republican',
+    'OH':'republican','IN':'republican','IL':'democrat','IA':'republican','NE':'lean-republican',
+    'SD':'republican','ND':'republican','MN':'democrat','WI':'lean-republican','MI':'lean-republican',
+    'CT':'democrat','RI':'democrat','MA':'democrat','VT':'democrat','NH':'democrat','ME':'lean-democrat',
+    'HI':'democrat','KS':'republican','MO':'republican'
   };
 
   const totals = { democrat:0, republican:0, undecided:0 };
@@ -28,69 +26,44 @@ document.addEventListener('DOMContentLoaded', () => {
   for(const state in electoralVotes){
     const party = electionResults[state] || 'undecided';
     const mainParty = party.replace('lean-','');
-    if(mainParty!=='undecided') totals[mainParty] += electoralVotes[state];
-    mapData[state] = { fillKey:party.toUpperCase(), votes:electoralVotes[state], party:party };
+    if(totals[mainParty]!==undefined) totals[mainParty] += electoralVotes[state];
+    mapData[state] = { fillKey: party.toUpperCase(), votes:electoralVotes[state], party };
   }
   totals.undecided = totalVotes - totals.democrat - totals.republican;
 
-  // Remove any overlay effect by setting default fill darker
+  const tooltip = d3.select('body')
+    .append('div')
+    .attr('id','tooltip');
+
   const map = new Datamap({
     element: document.getElementById('map-container'),
     scope: 'usa',
     responsive:true,
-    fills: { 
-      'DEMOCRAT':'#2563eb',
-      'REPUBLICAN':'#dc2626',
-      'LEAN-DEMOCRAT':'#93c5fd',
-      'LEAN-REPUBLICAN':'#fca5a5',
-      'UNDECIDED':'#222',
-      'defaultFill':'#111' 
+    fills:{ 
+      'DEMOCRAT':'#2563eb','REPUBLICAN':'#dc2626',
+      'LEAN-DEMOCRAT':'#93c5fd','LEAN-REPUBLICAN':'#fca5a5',
+      'UNDECIDED':'transparent','defaultFill':'transparent' 
     },
     data: mapData,
     geographyConfig:{
-      borderColor:'#555',
-      highlightFillColor:'#444',
+      borderColor:'#888',
+      highlightFillColor:'#666',
       highlightBorderColor:'#fff',
       highlightBorderWidth:2,
       highlightOnHover:true,
       popupOnHover:false
-    },
-    done: function(datamap){
-      // Attach state abbreviations + EVs to each <g> so they move with zoom/pan
-      datamap.svg.selectAll('.datamaps-subunit')
-        .each(function(geo){
-          const state = geo.id;
-          const centroid = datamap.path.centroid(geo);
-          d3.select(this.parentNode)
-            .append('text')
-            .attr('x', centroid[0])
-            .attr('y', centroid[1])
-            .attr('text-anchor','middle')
-            .attr('dy','0.35em')
-            .attr('fill','#fff')
-            .attr('font-size','14px') // bigger font
-            .attr('font-weight','700')
-            .attr('font-family','Inter, sans-serif')
-            .attr('pointer-events','none')
-            .text(`${state} (${electoralVotes[state]})`);
-        });
     }
   });
-
-  // Tooltip hover
-  const tooltip = d3.select('body').append('div')
-    .attr('id','tooltip')
-    .style('background','none'); // remove any dark overlay behind tooltip if you want
 
   map.svg.selectAll('.datamaps-subunit')
     .on('mouseover', function(d){
       const state = d.id;
       const data = mapData[state];
       tooltip.style('display','block')
-             .html(`<strong>${d.properties.name}</strong><br/>
-                    Electoral Votes: ${data.votes}<br/>
-                    Party: ${data.party.replace('lean-','').charAt(0).toUpperCase() +
-                            data.party.replace('lean-','').slice(1)}${data.party.startsWith('lean-') ? ' (Lean)' : ''}`);
+             .html(`<strong>${d.properties.name}</strong> (${state})<br/>
+                    EVs: ${data.votes}<br/>
+                    Party: ${data.party.replace('lean-','').charAt(0).toUpperCase() + 
+                           data.party.replace('lean-','').slice(1)}${data.party.startsWith('lean-')?' (Lean)':''}`);
     })
     .on('mousemove', function(){
       tooltip.style('top', (d3.event.pageY + 15) + 'px')
@@ -100,15 +73,28 @@ document.addEventListener('DOMContentLoaded', () => {
       tooltip.style('display','none');
     });
 
-  // Zoom & pan
   const zoom = d3.behavior.zoom()
-    .scaleExtent([0.5,5])
+    .scaleExtent([0.5,8])
     .on('zoom', ()=> map.svg.selectAll('g').attr('transform', `translate(${d3.event.translate})scale(${d3.event.scale})`));
   map.svg.call(zoom);
 
   // Update vote bars
+  document.getElementById('democrat-votes').textContent = totals.democrat;
+  document.getElementById('republican-votes').textContent = totals.republican;
+  document.getElementById('undecided-votes').textContent = totals.undecided;
+
   const demPercent = totals.democrat/538*100;
   const repPercent = totals.republican/538*100;
   document.getElementById('democrat-bar').style.width = demPercent + '%';
   document.getElementById('republican-bar').style.width = repPercent + '%';
+
+  // Small states boxes
+  const smallStates = ['DE','DC','RI','NH','VT','ME'];
+  const container = document.getElementById('small-states-container');
+  smallStates.forEach(state => {
+    const box = document.createElement('div');
+    box.className = 'small-state-box';
+    box.textContent = `${state} (${electoralVotes[state]})`;
+    container.appendChild(box);
+  });
 });
