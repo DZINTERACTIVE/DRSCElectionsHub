@@ -5,9 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Interactive US Electoral Map</title>
 <link rel="stylesheet" href="style.css">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/datamaps/0.5.9/datamaps.usa.min.js"></script>
@@ -16,27 +14,18 @@
 <div id="map-container"></div>
 
 <div id="ui-overlay">
-    <header>
-        <h1>US Electoral College Map</h1>
-        <p>Hover over states to see details</p>
-    </header>
-    <div id="results-container">
-        <div id="winner-banner"><h2>Target: 270 to win</h2></div>
-        <div id="legend">
-            <div class="legend-item democrat">
-                <h2>Democrat</h2>
-                <p id="democrat-votes">0</p>
-            </div>
-            <div class="legend-item undecided">
-                <h2>Undecided</h2>
-                <p id="undecided-votes">0</p>
-            </div>
-            <div class="legend-item republican">
-                <h2>Republican</h2>
-                <p id="republican-votes">0</p>
-            </div>
+    <div id="legend">
+        <div class="legend-item democrat">
+            <p>Democrat</p><span id="democrat-votes">0</span>
+        </div>
+        <div class="legend-item republican">
+            <p>Republican</p><span id="republican-votes">0</span>
+        </div>
+        <div class="legend-item undecided">
+            <p>Undecided</p><span id="undecided-votes">0</span>
         </div>
     </div>
+    <div id="winner-banner"><p>Target: 270 to win</p></div>
 </div>
 
 <script src="script.js"></script>
