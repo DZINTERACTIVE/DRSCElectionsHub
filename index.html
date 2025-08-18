@@ -4,36 +4,31 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>US Electoral Map</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/datamaps/0.5.9/datamaps.usa.min.js"></script>
 </head>
 <body>
-<div id="map-container"></div>
-
-<!-- Top overlay -->
 <div id="results-overlay">
   <div id="vote-bar-wrapper">
     <div class="candidate democrat">
-      <img src="democrat.jpg" alt="Democrat">
+      <img src="https://i.imgur.com/lkzXfD3.jpg" alt="Democrat Candidate">
       <div class="votes" id="democrat-votes">0</div>
     </div>
-
     <div id="vote-bar">
       <div id="democrat-bar"></div>
       <div id="republican-bar"></div>
     </div>
-
     <div class="candidate republican">
-      <img src="republican.jpg" alt="Republican">
+      <img src="https://i.imgur.com/7Y0EibK.jpg" alt="Republican Candidate">
       <div class="votes" id="republican-votes">0</div>
     </div>
   </div>
   <div id="undecided-votes">Undecided: 0</div>
 </div>
-
+<div id="map-container"></div>
 <script src="script.js"></script>
 </body>
 </html>
