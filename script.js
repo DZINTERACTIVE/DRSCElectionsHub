@@ -40,31 +40,23 @@ document.addEventListener('DOMContentLoaded', () => {
     scope: 'usa',
     responsive:true,
     fills: { 
-      'DEMOCRAT':'#2563eb','REPUBLICAN':'#dc2626',
-      'LEAN-DEMOCRAT':'#93c5fd','LEAN-REPUBLICAN':'#fca5a5',
-      'UNDECIDED':'transparent','defaultFill':'transparent' 
+      'DEMOCRAT':'#2563eb',
+      'REPUBLICAN':'#dc2626',
+      'LEAN-DEMOCRAT':'#93c5fd',
+      'LEAN-REPUBLICAN':'#fca5a5',
+      'UNDECIDED':'#444',
+      'defaultFill':'#222' 
     },
     data: mapData,
     geographyConfig:{
       borderColor:'#555',
-      highlightFillColor:'#444',
+      highlightFillColor:'#666',
       highlightBorderColor:'#fff',
       highlightBorderWidth:2,
       highlightOnHover:true,
       popupOnHover:false
     }
   });
-
-  // Add state abbreviations + EVs
-  map.svg.selectAll('.datamaps-subunit')
-     .each(function(d){
-       const center = d3.select(this).node().getBBox();
-       map.svg.append('text')
-          .attr('class','state-label')
-          .attr('x', center.x + center.width/2)
-          .attr('y', center.y + center.height/2)
-          .text(d.id + ' (' + electoralVotes[d.id] + ')');
-     });
 
   // Tooltip hover
   map.svg.selectAll('.datamaps-subunit')
@@ -76,4 +68,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     Electoral Votes: ${data.votes}<br/>
                     Party: ${data.party.replace('lean-','').charAt(0).toUpperCase() +
                             data.party.replace('lean-','').slice(1)}${data.party.startsWith('lean-') ? ' (Lean)' : ''}`);
-      if(data.party==='undecided') d3.sele
+    })
+    .on('mousemove', function(){
+      tooltip.style('top', (d3.event.pageY + 15) + 'px')
+             .style('left', (d3.event.pageX + 15) + 'px');
+    })
+    .on('mouseout', function(d){
+      tooltip.style('display','none');
+    });
+
+  // Zoom & pan
+  const zoom = d3.behavior.zoom()
+    .scaleExtent([0.5,5])
+    .on('zoom', ()=> map.svg.selectAll('g').attr('transform', `translate(${d3.event.translate})scale(${d3.event.scale})`));
+  map.svg.call(zoom);
+
+  // Vote bar animation
+  const demPercent = totals.democrat/538*100;
+  const repPercent = totals.republican/538*100;
+  document.getElementById('democrat-bar').style.width = demPercent + '%';
+  document.getElementById('republican-bar').style.width = repPercent + '%';
+});
