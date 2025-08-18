@@ -4,7 +4,7 @@ html, body {
   width: 100%;
   height: 100%;
   font-family: 'Inter', sans-serif;
-  background: #111; /* dark background */
+  background: #111;
   color: #fff;
 }
 
@@ -48,14 +48,15 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 30px;
+  gap: 20px;
   pointer-events: none;
 }
 
-#candidates {
+/* Vote bar container */
+#vote-bar-container {
   display: flex;
   align-items: center;
-  gap: 50px;
+  gap: 20px;
 }
 
 .candidate {
@@ -66,20 +67,61 @@ html, body {
 }
 
 .candidate img {
-  width: 100px;
-  height: 100px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #fff;
 }
 
-.candidate p { margin: 0; font-weight: 600; }
-.candidate span { font-size: 2em; font-weight: 700; }
+.candidate span {
+  font-size: 1.5em;
+  font-weight: 700;
+}
 
 .democrat span { color: #2563eb; }
 .republican span { color: #dc2626; }
 
-.line { width: 3px; background: #888; height: 100px; position: relative; }
-.line span { position: absolute; top: -15px; left: 10px; font-weight: 700; }
+/* Vote bar */
+#vote-bar {
+  position: relative;
+  width: 400px;
+  height: 30px;
+  background: #333;
+  border-radius: 15px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
 
-#undecided-votes-container p { font-size: 1.2em; margin: 0; }
+#democrat-bar {
+  position: absolute;
+  left: 0;
+  height: 100%;
+  background: #2563eb;
+  width: 0;
+  transition: width 0.5s ease;
+}
+
+#republican-bar {
+  position: absolute;
+  right: 0;
+  height: 100%;
+  background: #dc2626;
+  width: 0;
+  transition: width 0.5s ease;
+}
+
+#target-line {
+  position: absolute;
+  left: 270 / 538 * 100%; /* 270 out of 538 votes */
+  transform: translateX(-50%);
+  height: 100%;
+  width: 2px;
+  background: #fff;
+}
+
+#undecided-votes-container p {
+  font-size: 1.2em;
+  margin: 0;
+}
