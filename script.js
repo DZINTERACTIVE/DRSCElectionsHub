@@ -7,67 +7,60 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const electionResults = {};
-  const partyColors = { democrat:'#2563eb', republican:'#dc2626', undecided:'#6b7280' };
-
-  const mapData = {};
   const totals = { democrat:0, republican:0, undecided:0 };
   const totalVotes = Object.values(electoralVotes).reduce((a,b)=>a+b,0);
 
   for(const state in electoralVotes){
     const party = electionResults[state] || 'undecided';
-    mapData[state] = { fillKey:'UNASSIGNED', party, votes:electoralVotes[state] };
     totals[party] += electoralVotes[state];
   }
   totals.undecided = totalVotes - totals.democrat - totals.republican;
 
+  // Map
   const map = new Datamap({
     element: document.getElementById('map-container'),
-    scope: 'usa',
-    responsive: true,
-    fills: { 'DEMOCRAT': partyColors.democrat, 'REPUBLICAN': partyColors.republican, 'UNASSIGNED':'transparent', 'defaultFill':'transparent' },
-    data: mapData,
-    geographyConfig: {
-      popupTemplate: (geo, data) => `<div class="datamaps-hoverover"><strong>${geo.properties.name}</strong><br/>Party: ${data.party}<br/>Electoral Votes: ${data.votes}</div>`,
-      borderColor: '#555',
-      highlightFillColor: '#333',
-      highlightBorderColor: '#fff',
-      highlightBorderWidth: 2
+    scope:'usa',
+    responsive:true,
+    fills:{ 'DEMOCRAT':'#2563eb','REPUBLICAN':'#dc2626','UNASSIGNED':'transparent','defaultFill':'transparent' },
+    data:{},
+    geographyConfig:{
+      popupTemplate:(geo,data)=>`<div class="datamaps-hoverover"><strong>${geo.properties.name}</strong></div>`,
+      borderColor:'#555',
+      highlightFillColor:'#333',
+      highlightBorderColor:'#fff',
+      highlightBorderWidth:2
     }
   });
-
   d3.select('#map-container svg rect').remove();
 
+  // Zoom & Center
   const zoom = d3.behavior.zoom()
-    .scaleExtent([0.5, 8])
-    .on('zoom', ()=> map.svg.selectAll('g').attr('transform', `translate(${d3.event.translate})scale(${d3.event.scale})`));
+    .scaleExtent([0.5,8])
+    .on('zoom',()=>map.svg.selectAll('g').attr('transform',`translate(${d3.event.translate})scale(${d3.event.scale})`));
   map.svg.call(zoom);
 
-  function centerMap() {
-    const container = document.getElementById('map-container');
-    const usaGroup = map.svg.select('g.datamaps-subunits');
-    if (!usaGroup.empty()) {
-      const bbox = usaGroup.node().getBBox();
-      const scale = Math.min(container.offsetWidth / bbox.width, container.offsetHeight / bbox.height) * 0.8;
-      const tx = (container.offsetWidth - bbox.width * scale) / 2 - bbox.x * scale;
-      const ty = (container.offsetHeight - bbox.height * scale) / 2 - bbox.y * scale;
-      zoom.translate([tx, ty]).scale(scale);
-      map.svg.selectAll('g').attr('transform', `translate(${tx},${ty})scale(${scale})`);
+  function centerMap(){
+    const container=document.getElementById('map-container');
+    const usaGroup=map.svg.select('g.datamaps-subunits');
+    if(!usaGroup.empty()){
+      const bbox=usaGroup.node().getBBox();
+      const scale=Math.min(container.offsetWidth/bbox.width,container.offsetHeight/bbox.height)*0.8;
+      const tx=(container.offsetWidth-bbox.width*scale)/2-bbox.x*scale;
+      const ty=(container.offsetHeight-bbox.height*scale)/2-bbox.y*scale;
+      zoom.translate([tx,ty]).scale(scale);
+      map.svg.selectAll('g').attr('transform',`translate(${tx},${ty})scale(${scale})`);
     }
   }
-  setTimeout(centerMap, 100);
-  window.addEventListener('resize', () => map.resize());
+  setTimeout(centerMap,100);
+  window.addEventListener('resize',()=>map.resize());
 
-  // Update counters and bars
-  const demVotes = totals.democrat;
-  const repVotes = totals.republican;
-  const undecVotes = totals.undecided;
+  // Update vote bars dynamically
+  const demPercent = totals.democrat/538*100;
+  const repPercent = totals.republican/538*100;
 
-  document.getElementById('democrat-votes').textContent = demVotes;
-  document.getElementById('republican-votes').textContent = repVotes;
-  document.getElementById('undecided-votes').textContent = undecVotes;
-
-  const demPercent = demVotes / 538 * 100;
-  const repPercent = repVotes / 538 * 100;
+  document.getElementById('democrat-votes').textContent = totals.democrat;
+  document.getElementById('republican-votes').textContent = totals.republican;
+  document.getElementById('undecided-votes').textContent = totals.undecided;
 
   document.getElementById('democrat-bar').style.width = demPercent + '%';
   document.getElementById('republican-bar').style.width = repPercent + '%';
