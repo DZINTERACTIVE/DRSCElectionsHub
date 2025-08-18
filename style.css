@@ -1,104 +1,85 @@
 html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    font-family: 'Inter', sans-serif;
-    background: #111;
-    color: #fff;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font-family: 'Inter', sans-serif;
+  background: #111; /* dark background */
+  color: #fff;
 }
 
 #map-container {
-    width: 100%;
-    height: 100%;
-    position: absolute;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  background: #111;
 }
 
 .datamaps-subunit {
-    fill: transparent;
-    stroke: #444;
-    stroke-width: 1.5;
-    transition: fill 0.3s, stroke 0.3s;
+  fill: transparent;
+  stroke: #555;
+  stroke-width: 1.5;
+  transition: fill 0.3s, stroke 0.3s;
 }
 
 .datamaps-subunit:hover {
-    fill: #333;
-    stroke: #fff;
-    cursor: pointer;
+  fill: #333;
+  stroke: #fff;
+  cursor: pointer;
 }
 
 .datamaps-hoverover {
-    background: rgba(0,0,0,0.85);
-    color: #fff;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 0.9em;
-    font-weight: 500;
-    pointer-events: none;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.85);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.9em;
+  font-weight: 500;
+  pointer-events: none;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
 }
 
+/* Center overlay in the middle of the screen */
 #results-overlay {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%,-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 30px;
-    pointer-events: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  pointer-events: none;
 }
 
 #candidates {
-    display: flex;
-    align-items: center;
-    gap: 50px;
+  display: flex;
+  align-items: center;
+  gap: 50px;
 }
 
 .candidate {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
 }
 
 .candidate img {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #fff;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #fff;
 }
 
-.candidate p {
-    margin: 0;
-    font-weight: 600;
-}
-
-.candidate span {
-    font-size: 2em;
-    font-weight: 700;
-}
+.candidate p { margin: 0; font-weight: 600; }
+.candidate span { font-size: 2em; font-weight: 700; }
 
 .democrat span { color: #2563eb; }
 .republican span { color: #dc2626; }
 
-.line {
-    width: 3px;
-    background: #888;
-    height: 100px;
-    position: relative;
-}
+.line { width: 3px; background: #888; height: 100px; position: relative; }
+.line span { position: absolute; top: -15px; left: 10px; font-weight: 700; }
 
-.line span {
-    position: absolute;
-    top: -15px;
-    left: 10px;
-    font-weight: 700;
-}
-
-#undecided-votes-container p {
-    font-size: 1.2em;
-    margin: 0;
-}
+#undecided-votes-container p { font-size: 1.2em; margin: 0; }
