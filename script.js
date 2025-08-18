@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     'TN':11,'TX':40,'UT':6,'VT':3,'VA':13,'WA':12,'WV':4,'WI':10,'WY':3
   };
 
-  const electionResults = {}; // All unassigned
+  const electionResults = {}; // all unassigned
   const totals = { democrat:0, republican:0, undecided:0 };
   const totalVotes = Object.values(electoralVotes).reduce((a,b)=>a+b,0);
 
@@ -23,16 +23,20 @@ document.addEventListener('DOMContentLoaded', () => {
     fills: { 'DEMOCRAT':'#2563eb','REPUBLICAN':'#dc2626','UNASSIGNED':'transparent','defaultFill':'transparent' },
     data: {},
     geographyConfig:{
-      popupTemplate:(geo)=>`<div class="datamaps-hoverover"><strong>${geo.properties.name}</strong></div>`,
+      popupTemplate:(geo)=>{
+        // only show tooltip for real states
+        if(!geo.id) return '';
+        return `<div class="datamaps-hoverover"><strong>${geo.properties.name}</strong></div>`;
+      },
       borderColor:'#555',
       highlightFillColor:'#333',
       highlightBorderColor:'#fff',
       highlightBorderWidth:2
     },
-    // Top-left anchor, not centered
+    // Top-left anchor
     setProjection: function(element){
       const projection = d3.geo.albersUsa()
-        .translate([0, 0])
+        .translate([0,0])
         .scale(1000);
       const path = d3.geo.path().projection(projection);
       return {path: path, projection: projection};
