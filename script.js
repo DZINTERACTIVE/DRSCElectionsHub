@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     'TN':11,'TX':40,'UT':6,'VT':3,'VA':13,'WA':12,'WV':4,'WI':10,'WY':3
   };
 
-  const electionResults = {}; // unassigned
+  const electionResults = {};
   const partyColors = { democrat:'#2563eb', republican:'#dc2626', undecided:'#6b7280' };
 
   const mapData = {};
@@ -24,20 +24,10 @@ document.addEventListener('DOMContentLoaded', () => {
     element: document.getElementById('map-container'),
     scope: 'usa',
     responsive: true,
-    fills: {
-      'DEMOCRAT': partyColors.democrat,
-      'REPUBLICAN': partyColors.republican,
-      'UNASSIGNED':'transparent',
-      'defaultFill':'transparent'
-    },
+    fills: { 'DEMOCRAT': partyColors.democrat, 'REPUBLICAN': partyColors.republican, 'UNASSIGNED':'transparent', 'defaultFill':'transparent' },
     data: mapData,
     geographyConfig: {
-      popupTemplate: (geo, data) => 
-        `<div class="datamaps-hoverover">
-          <strong>${geo.properties.name}</strong><br/>
-          Party: ${data.party}<br/>
-          Electoral Votes: ${data.votes}
-        </div>`,
+      popupTemplate: (geo, data) => `<div class="datamaps-hoverover"><strong>${geo.properties.name}</strong><br/>Party: ${data.party}<br/>Electoral Votes: ${data.votes}</div>`,
       borderColor: '#555',
       highlightFillColor: '#333',
       highlightBorderColor: '#fff',
@@ -45,13 +35,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Remove the automatic white background
   d3.select('#map-container svg rect').remove();
 
-  // Zoom and pan
   const zoom = d3.behavior.zoom()
-    .scaleExtent([0.5, 8]) // allow zoom out more (0.5)
-    .on('zoom', () => map.svg.selectAll('g').attr('transform', `translate(${d3.event.translate})scale(${d3.event.scale})`));
+    .scaleExtent([0.5, 8])
+    .on('zoom', ()=> map.svg.selectAll('g').attr('transform', `translate(${d3.event.translate})scale(${d3.event.scale})`));
   map.svg.call(zoom);
 
   function centerMap() {
@@ -69,8 +57,18 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(centerMap, 100);
   window.addEventListener('resize', () => map.resize());
 
-  // Update vote counters
-  document.getElementById('democrat-votes').textContent = totals.democrat;
-  document.getElementById('republican-votes').textContent = totals.republican;
-  document.getElementById('undecided-votes').textContent = totals.undecided;
+  // Update counters and bars
+  const demVotes = totals.democrat;
+  const repVotes = totals.republican;
+  const undecVotes = totals.undecided;
+
+  document.getElementById('democrat-votes').textContent = demVotes;
+  document.getElementById('republican-votes').textContent = repVotes;
+  document.getElementById('undecided-votes').textContent = undecVotes;
+
+  const demPercent = demVotes / 538 * 100;
+  const repPercent = repVotes / 538 * 100;
+
+  document.getElementById('democrat-bar').style.width = demPercent + '%';
+  document.getElementById('republican-bar').style.width = repPercent + '%';
 });
