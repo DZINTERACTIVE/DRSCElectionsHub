@@ -25,7 +25,7 @@ html, body {
 }
 
 .datamaps-subunit:hover {
-  fill:#333;
+  fill:#333; /* only highlight on real states */
   stroke:#fff;
   cursor:pointer;
 }
@@ -33,14 +33,14 @@ html, body {
 .datamaps-hoverover {
   background: rgba(0,0,0,0.85);
   color: #fff;
-  padding: 6px 10px;
+  padding: 8px 12px;
   border-radius: 6px;
-  font-size: 0.9em;
-  font-weight:500;
+  font-size: 1em;
+  font-weight:600;
   pointer-events:none;
 }
 
-/* Top overlay */
+/* Top overlay bigger */
 #results-overlay {
   position:fixed;
   top:10px;
@@ -49,8 +49,8 @@ html, body {
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap:10px;
-  width:90%;
+  gap:15px;
+  width:95%;
   pointer-events:none;
   z-index:10;
 }
@@ -66,34 +66,34 @@ html, body {
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap:5px;
+  gap:10px;
 }
 
 .candidate img {
-  width:50px;
-  height:50px;
+  width:80px;   /* bigger */
+  height:80px;
   border-radius:50%;
   object-fit:cover;
-  border:2px solid #fff;
+  border:3px solid #fff;
 }
 
 .votes {
-  font-size:1.1em;
+  font-size:1.4em;  /* bigger text */
   font-weight:700;
 }
 
 .democrat .votes { color:#2563eb; }
 .republican .votes { color:#dc2626; }
 
-/* Vote bar */
+/* Vote bar bigger */
 #vote-bar {
   position:relative;
-  height:16px;
+  height:24px;  /* bigger */
   background:#333;
-  border-radius:10px;
+  border-radius:12px;
   overflow:hidden;
   flex:1;
-  margin:0 15px;
+  margin:0 20px;
 }
 
 #democrat-bar, #republican-bar {
@@ -105,4 +105,4 @@ html, body {
 #democrat-bar { left:0; background:#2563eb; width:0; }
 #republican-bar { right:0; background:#dc2626; width:0; }
 
-#undecided-votes { font-size:0.9em; font-weight:500; margin-top:4px; }
+#undecided-votes { font-size:1.1em; font-weight:500; margin-top:6px; }
