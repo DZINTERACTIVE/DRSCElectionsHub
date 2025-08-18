@@ -33,8 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   totals.undecided = totalVotes - totals.democrat - totals.republican;
 
-  const tooltip = d3.select('body').append('div').attr('id','tooltip');
-
+  // Remove any overlay effect by setting default fill darker
   const map = new Datamap({
     element: document.getElementById('map-container'),
     scope: 'usa',
@@ -44,32 +43,34 @@ document.addEventListener('DOMContentLoaded', () => {
       'REPUBLICAN':'#dc2626',
       'LEAN-DEMOCRAT':'#93c5fd',
       'LEAN-REPUBLICAN':'#fca5a5',
-      'UNDECIDED':'#444',
-      'defaultFill':'#222' 
+      'UNDECIDED':'#222',
+      'defaultFill':'#111' 
     },
     data: mapData,
     geographyConfig:{
       borderColor:'#555',
-      highlightFillColor:'#666',
+      highlightFillColor:'#444',
       highlightBorderColor:'#fff',
       highlightBorderWidth:2,
       highlightOnHover:true,
       popupOnHover:false
     },
     done: function(datamap){
-      // Add state abbreviations + EVs attached to each state's <g> element
+      // Attach state abbreviations + EVs to each <g> so they move with zoom/pan
       datamap.svg.selectAll('.datamaps-subunit')
         .each(function(geo){
           const state = geo.id;
           const centroid = datamap.path.centroid(geo);
-          d3.select(this.parentNode) // attach text to same <g> as the state
+          d3.select(this.parentNode)
             .append('text')
             .attr('x', centroid[0])
             .attr('y', centroid[1])
             .attr('text-anchor','middle')
             .attr('dy','0.35em')
             .attr('fill','#fff')
-            .attr('font-size','10px')
+            .attr('font-size','14px') // bigger font
+            .attr('font-weight','700')
+            .attr('font-family','Inter, sans-serif')
             .attr('pointer-events','none')
             .text(`${state} (${electoralVotes[state]})`);
         });
@@ -77,6 +78,10 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Tooltip hover
+  const tooltip = d3.select('body').append('div')
+    .attr('id','tooltip')
+    .style('background','none'); // remove any dark overlay behind tooltip if you want
+
   map.svg.selectAll('.datamaps-subunit')
     .on('mouseover', function(d){
       const state = d.id;
