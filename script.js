@@ -55,6 +55,23 @@ document.addEventListener('DOMContentLoaded', () => {
       highlightBorderWidth:2,
       highlightOnHover:true,
       popupOnHover:false
+    },
+    done: function(datamap){
+      // Add state abbreviations + EVs on top of each state
+      datamap.svg.selectAll('.datamaps-subunit')
+        .each(function(geo){
+          const state = geo.id;
+          const centroid = datamap.path.centroid(geo);
+          datamap.svg.append('text')
+            .attr('x', centroid[0])
+            .attr('y', centroid[1])
+            .attr('text-anchor','middle')
+            .attr('dy','0.35em')
+            .attr('fill','#fff')
+            .attr('font-size','10px')
+            .attr('pointer-events','none')
+            .text(`${state}\n${electoralVotes[state]}`);
+        });
     }
   });
 
@@ -83,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
     .on('zoom', ()=> map.svg.selectAll('g').attr('transform', `translate(${d3.event.translate})scale(${d3.event.scale})`));
   map.svg.call(zoom);
 
-  // Vote bar animation
+  // Update vote bars
   const demPercent = totals.democrat/538*100;
   const repPercent = totals.republican/538*100;
   document.getElementById('democrat-bar').style.width = demPercent + '%';
