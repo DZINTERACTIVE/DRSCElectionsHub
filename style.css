@@ -21,13 +21,7 @@ html, body {
   fill:transparent;
   stroke:#555;
   stroke-width:1.5;
-  transition: fill 0.2s, stroke 0.2s;
-}
-
-.datamaps-subunit:hover {
-  fill:#333;
-  stroke:#fff;
-  cursor:pointer;
+  transition: fill 0.3s, stroke 0.3s;
 }
 
 .datamaps-hoverover {
@@ -70,7 +64,7 @@ html, body {
 }
 
 .candidate img {
-  width:100px;   /* bigger */
+  width:100px;  
   height:100px;
   border-radius:50%;
   object-fit:cover;
@@ -78,17 +72,16 @@ html, body {
 }
 
 .votes {
-  font-size:1.6em;  /* bigger text */
+  font-size:1.6em;  
   font-weight:700;
 }
 
 .democrat .votes { color:#2563eb; }
 .republican .votes { color:#dc2626; }
 
-/* Vote bar bigger */
 #vote-bar {
   position:relative;
-  height:36px;  /* much bigger */
+  height:36px;  
   background:#333;
   border-radius:18px;
   overflow:hidden;
