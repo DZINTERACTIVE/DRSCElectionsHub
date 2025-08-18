@@ -73,28 +73,30 @@ document.addEventListener('DOMContentLoaded', () => {
       tooltip.style('display','none');
     });
 
+  // Zoom & pan
   const zoom = d3.behavior.zoom()
     .scaleExtent([0.5,8])
     .on('zoom', ()=> map.svg.selectAll('g').attr('transform', `translate(${d3.event.translate})scale(${d3.event.scale})`));
   map.svg.call(zoom);
 
-  // Update vote bars
-  document.getElementById('democrat-votes').textContent = totals.democrat;
-  document.getElementById('republican-votes').textContent = totals.republican;
-  document.getElementById('undecided-votes').textContent = totals.undecided;
+  // Add state abbreviations + EVs
+  map.svg.selectAll('.datamaps-subunit').each(function(d){
+    const centroid = map.path.centroid(d);
+    const state = d.id;
+    const ev = electoralVotes[state];
+    d3.select(map.svg.node().parentNode).append('text')
+      .attr('x', centroid[0])
+      .attr('y', centroid[1]+4)
+      .attr('text-anchor','middle')
+      .attr('font-size','10px')
+      .attr('fill','#fff')
+      .attr('pointer-events','none')
+      .text(`${state} (${ev})`);
+  });
 
+  // Update vote bars
   const demPercent = totals.democrat/538*100;
   const repPercent = totals.republican/538*100;
   document.getElementById('democrat-bar').style.width = demPercent + '%';
   document.getElementById('republican-bar').style.width = repPercent + '%';
-
-  // Small states boxes
-  const smallStates = ['DE','DC','RI','NH','VT','ME'];
-  const container = document.getElementById('small-states-container');
-  smallStates.forEach(state => {
-    const box = document.createElement('div');
-    box.className = 'small-state-box';
-    box.textContent = `${state} (${electoralVotes[state]})`;
-    container.appendChild(box);
-  });
 });
