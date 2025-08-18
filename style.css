@@ -1,127 +1,128 @@
 html, body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  font-family: 'Inter', sans-serif;
-  background: #111;
-  color: #fff;
+  margin:0;
+  padding:0;
+  width:100%;
+  height:100%;
+  font-family:'Inter', sans-serif;
+  background:#111;
+  color:#fff;
 }
 
 #map-container {
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  background: #111;
+  position:absolute;
+  width:100%;
+  height:100%;
+  background:#111;
 }
 
 .datamaps-subunit {
-  fill: transparent;
-  stroke: #555;
-  stroke-width: 1.5;
+  fill:transparent;
+  stroke:#555;
+  stroke-width:1.5;
   transition: fill 0.3s, stroke 0.3s;
 }
 
 .datamaps-subunit:hover {
-  fill: #333;
-  stroke: #fff;
-  cursor: pointer;
+  fill:#333;
+  stroke:#fff;
+  cursor:pointer;
 }
 
 .datamaps-hoverover {
   background: rgba(0,0,0,0.85);
   color: #fff;
-  padding: 8px 12px;
+  padding: 6px 10px;
   border-radius: 6px;
   font-size: 0.9em;
-  font-weight: 500;
-  pointer-events: none;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  font-weight:500;
+  pointer-events:none;
 }
 
-/* Center overlay in the middle of the screen */
+/* Overlay center */
 #results-overlay {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  pointer-events: none;
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:20px;
 }
 
-/* Vote bar container */
-#vote-bar-container {
-  display: flex;
-  align-items: center;
-  gap: 20px;
+/* Candidates + vote bar */
+#vote-bar-wrapper {
+  display:flex;
+  align-items:center;
+  gap:20px;
 }
 
 .candidate {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
 }
 
 .candidate img {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #fff;
+  width:90px;
+  height:90px;
+  border-radius:50%;
+  object-fit:cover;
+  border:2px solid #fff;
 }
 
-.candidate span {
-  font-size: 1.5em;
-  font-weight: 700;
+.votes {
+  font-size:1.5em;
+  font-weight:700;
 }
 
-.democrat span { color: #2563eb; }
-.republican span { color: #dc2626; }
+.democrat .votes { color:#2563eb; }
+.republican .votes { color:#dc2626; }
 
 /* Vote bar */
 #vote-bar {
-  position: relative;
-  width: 400px;
-  height: 30px;
-  background: #333;
-  border-radius: 15px;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
+  position:relative;
+  width:450px;
+  height:30px;
+  background:#333;
+  border-radius:15px;
+  overflow:hidden;
+}
+
+#democrat-bar, #republican-bar {
+  position:absolute;
+  height:100%;
+  transition:width 0.5s ease;
 }
 
 #democrat-bar {
-  position: absolute;
-  left: 0;
-  height: 100%;
-  background: #2563eb;
-  width: 0;
-  transition: width 0.5s ease;
+  left:0;
+  background:#2563eb;
+  width:0;
 }
 
 #republican-bar {
-  position: absolute;
-  right: 0;
-  height: 100%;
-  background: #dc2626;
-  width: 0;
-  transition: width 0.5s ease;
+  right:0;
+  background:#dc2626;
+  width:0;
 }
 
 #target-line {
-  position: absolute;
-  left: 270 / 538 * 100%; /* 270 out of 538 votes */
-  transform: translateX(-50%);
-  height: 100%;
-  width: 2px;
-  background: #fff;
+  position:absolute;
+  left:50%; /* 270 out of 538 */
+  transform:translateX(-50%);
+  width:2px;
+  height:100%;
+  background:#fff;
+  font-size:0.8em;
+  font-weight:700;
+  text-align:center;
 }
 
-#undecided-votes-container p {
-  font-size: 1.2em;
-  margin: 0;
+/* Undecided */
+#undecided-votes {
+  margin-top:10px;
+  font-size:1em;
+  font-weight:500;
 }
