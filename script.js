@@ -6,61 +6,19 @@ document.addEventListener('DOMContentLoaded', () => {
     'TN':11,'TX':40,'UT':6,'VT':3,'VA':13,'WA':12,'WV':4,'WI':10,'WY':3
   };
 
-  // ----------------------------
-  // All states included here
-  // ----------------------------
   const electionResults = {
-    'AL':'republican',
-    'AK':'republican',
-    'AZ':'lean-republican',
-    'AR':'republican',
-    'CA':'democrat',
-    'CO':'democrat',
-    'CT':'democrat',
-    'DE':'democrat',
-    'DC':'democrat',
-    'FL':'republican',
-    'GA':'lean-democrat',
-    'HI':'democrat',
-    'ID':'republican',
-    'IL':'democrat',
-    'IN':'republican',
-    'IA':'republican',
-    'KS':'republican',
-    'KY':'republican',
-    'LA':'republican',
-    'ME':'lean-democrat',
-    'MD':'democrat',
-    'MA':'democrat',
-    'MI':'lean-republican',
-    'MN':'democrat',
-    'MS':'republican',
-    'MO':'republican',
-    'MT':'republican',
-    'NE':'lean-republican',
-    'NV':'lean-republican',
-    'NH':'democrat',
-    'NJ':'lean-democrat',
-    'NM':'democrat',
-    'NY':'democrat',
-    'NC':'lean-republican',
-    'ND':'republican',
-    'OH':'republican',
-    'OK':'republican',
-    'OR':'democrat',
-    'PA':'lean-republican',
-    'RI':'democrat',
-    'SC':'republican',
-    'SD':'republican',
-    'TN':'republican',
-    'TX':'republican',
-    'UT':'republican',
-    'VT':'democrat',
-    'VA':'lean-democrat',
-    'WA':'democrat',
-    'WV':'republican',
-    'WI':'lean-republican',
-    'WY':'republican'
+    'CA': 'democrat','NY': 'democrat','TX': 'republican','FL': 'republican',
+    'GA': 'lean-democrat','NC': 'lean-republican','AZ': 'lean-republican','NM': 'democrat',
+    'CO': 'democrat','UT': 'republican','NV': 'lean-republican','ID': 'republican',
+    'WA': 'democrat','OR': 'democrat','WY': 'republican','MT': 'republican',
+    'OK': 'republican','AR': 'republican','LA': 'republican','MS': 'republican',
+    'AL': 'republican','TN': 'republican','SC': 'republican','KY': 'republican',
+    'VA': 'lean-democrat','WV': 'republican','MD': 'democrat','DE': 'democrat',
+    'NJ': 'lean-democrat','PA': 'lean-republican','OH': 'republican','IN': 'republican',
+    'IL': 'democrat','IA': 'republican','NE': 'lean-republican','SD': 'republican',
+    'ND': 'republican','MN': 'democrat','WI': 'lean-republican','MI': 'lean-republican',
+    'CT': 'democrat','RI': 'democrat','MA': 'democrat','VT': 'democrat',
+    'NH': 'democrat','ME': 'lean-democrat','HI':'democrat','AK':'republican','KS':'republican'
   };
 
   const totals = { democrat:0, republican:0, undecided:0 };
@@ -70,36 +28,26 @@ document.addEventListener('DOMContentLoaded', () => {
   for(const state in electoralVotes){
     const party = electionResults[state] || 'undecided';
     const mainParty = party.replace('lean-','');
-    totals[mainParty] += electoralVotes[state];
-    mapData[state] = {
-      fillKey: party.toUpperCase(),
-      votes: electoralVotes[state],
-      party: party
-    };
+    if(mainParty!=='undecided') totals[mainParty] += electoralVotes[state];
+    mapData[state] = { fillKey:party.toUpperCase(), votes:electoralVotes[state], party:party };
   }
   totals.undecided = totalVotes - totals.democrat - totals.republican;
 
-  // Tooltip div
-  const tooltip = d3.select('body')
-    .append('div')
-    .attr('id','tooltip');
+  const tooltip = d3.select('body').append('div').attr('id','tooltip');
 
   const map = new Datamap({
     element: document.getElementById('map-container'),
     scope: 'usa',
     responsive:true,
     fills: { 
-      'DEMOCRAT':'#2563eb',
-      'REPUBLICAN':'#dc2626',
-      'LEAN-DEMOCRAT':'#93c5fd',
-      'LEAN-REPUBLICAN':'#fca5a5',
-      'UNDECIDED':'transparent',
-      'defaultFill':'transparent' 
+      'DEMOCRAT':'#2563eb','REPUBLICAN':'#dc2626',
+      'LEAN-DEMOCRAT':'#93c5fd','LEAN-REPUBLICAN':'#fca5a5',
+      'UNDECIDED':'transparent','defaultFill':'transparent' 
     },
     data: mapData,
     geographyConfig:{
-      borderColor:'#888',
-      highlightFillColor:'#666',
+      borderColor:'#555',
+      highlightFillColor:'#444',
       highlightBorderColor:'#fff',
       highlightBorderWidth:2,
       highlightOnHover:true,
@@ -114,11 +62,9 @@ document.addEventListener('DOMContentLoaded', () => {
       tooltip.style('display','block')
              .html(`<strong>${d.properties.name}</strong><br/>
                     Electoral Votes: ${data.votes}<br/>
-                    Party: ${data.party.replace('lean-','').charAt(0).toUpperCase() + 
+                    Party: ${data.party.replace('lean-','').charAt(0).toUpperCase() +
                             data.party.replace('lean-','').slice(1)}${data.party.startsWith('lean-') ? ' (Lean)' : ''}`);
-      if(data.party==='undecided'){
-        d3.select(this).style('fill','#444');
-      }
+      if(data.party==='undecided') d3.select(this).style('fill','#666');
     })
     .on('mousemove', function(){
       tooltip.style('top', (d3.event.pageY + 15) + 'px')
@@ -127,18 +73,14 @@ document.addEventListener('DOMContentLoaded', () => {
     .on('mouseout', function(d){
       tooltip.style('display','none');
       const state = d.id;
-      if(mapData[state].party==='undecided'){
-        d3.select(this).style('fill','transparent');
-      }
+      if(mapData[state].party==='undecided') d3.select(this).style('fill','transparent');
     });
 
-  // Zoom & pan
   const zoom = d3.behavior.zoom()
-    .scaleExtent([0.5,8])
+    .scaleExtent([0.3,8])
     .on('zoom', ()=> map.svg.selectAll('g').attr('transform', `translate(${d3.event.translate})scale(${d3.event.scale})`));
   map.svg.call(zoom);
 
-  // Update vote bars
   const demPercent = totals.democrat/538*100;
   const repPercent = totals.republican/538*100;
 
