@@ -24,16 +24,15 @@ document.addEventListener('DOMContentLoaded', () => {
     data: {},
     geographyConfig:{
       popupTemplate:(geo)=>{
-        // only show tooltip for real states
         if(!geo.id) return '';
         return `<div class="datamaps-hoverover"><strong>${geo.properties.name}</strong></div>`;
       },
       borderColor:'#555',
       highlightFillColor:'#333',
       highlightBorderColor:'#fff',
-      highlightBorderWidth:2
+      highlightBorderWidth:2,
+      highlightOnHover:true
     },
-    // Top-left anchor
     setProjection: function(element){
       const projection = d3.geo.albersUsa()
         .translate([0,0])
@@ -45,6 +44,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Remove default rect
   d3.select('#map-container svg rect').remove();
+
+  // Prevent states from staying highlighted
+  map.svg.selectAll('.datamaps-subunit')
+    .on('mouseout', function(d){
+      d3.select(this).style('fill','transparent');
+    });
 
   // Zoom & pan
   const zoom = d3.behavior.zoom()
