@@ -18,26 +18,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const map = new Datamap({
     element: document.getElementById('map-container'),
-    scope:'usa',
-    responsive:true,
-    fills:{ 'DEMOCRAT':'#2563eb','REPUBLICAN':'#dc2626','UNASSIGNED':'transparent','defaultFill':'transparent' },
-    data:{},
+    scope: 'usa',
+    responsive: true,
+    fills: { 'DEMOCRAT':'#2563eb','REPUBLICAN':'#dc2626','UNASSIGNED':'transparent','defaultFill':'transparent' },
+    data: {},
     geographyConfig:{
       popupTemplate:(geo)=>`<div class="datamaps-hoverover"><strong>${geo.properties.name}</strong></div>`,
       borderColor:'#555',
       highlightFillColor:'#333',
       highlightBorderColor:'#fff',
       highlightBorderWidth:2
+    },
+    // Top-left anchor, not centered
+    setProjection: function(element){
+      const projection = d3.geo.albersUsa()
+        .translate([0, 0])
+        .scale(1000);
+      const path = d3.geo.path().projection(projection);
+      return {path: path, projection: projection};
     }
   });
 
-  // Remove default rectangle to keep full map visible
+  // Remove default rect
   d3.select('#map-container svg rect').remove();
 
-  // Enable zoom & pan
+  // Zoom & pan
   const zoom = d3.behavior.zoom()
     .scaleExtent([0.5,8])
-    .on('zoom',()=>map.svg.selectAll('g').attr('transform',`translate(${d3.event.translate})scale(${d3.event.scale})`));
+    .on('zoom', ()=> map.svg.selectAll('g').attr('transform', `translate(${d3.event.translate})scale(${d3.event.scale})`));
   map.svg.call(zoom);
 
   // Update vote bars
