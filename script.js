@@ -42,11 +42,8 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         data: mapData,
         geographyConfig: {
-            popupTemplate: (geo, data) => `<div class="hoverinfo"><strong>${geo.properties.name}</strong><br/>Votes: ${data.votes}<br/>Party: ${data.party}</div>`,
-            borderColor: '#000',
-            highlightFillColor: (data) => mapData[data.id] ? partyColors[mapData[data.id].party] : partyColors.undecided,
-            highlightBorderColor: '#fff',
-            highlightBorderWidth: 2
+            popupTemplate: (geo, data) => `<div>${geo.properties.name}: ${data.party}</div>`,
+            borderColor: '#000'
         },
         setProjection: function(element) {
             const projection = d3.geo.albersUsa()
@@ -56,6 +53,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return { path, projection };
         }
     });
+
+    // REMOVE THE BLACK RECTANGLE DATAMAPS CREATES
+    d3.select('#map-container svg rect').remove();
 
     // Zoom & pan
     const zoom = d3.behavior.zoom()
@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(centerMap,100);
     window.addEventListener('resize', ()=>map.resize());
 
-    // Update totals
+    // Update vote totals
     document.getElementById('democrat-votes').textContent = totals.democrat;
     document.getElementById('republican-votes').textContent = totals.republican;
     document.getElementById('undecided-votes').textContent = totals.undecided;
