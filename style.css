@@ -61,43 +61,4 @@ html, body {
 .candidate {
   display:flex;
   flex-direction:column;
-  align-items:center;
-  gap:10px;
-}
-
-.candidate img {
-  width:100px;
-  height:100px;
-  border-radius:50%;
-  object-fit:cover;
-  border:3px solid #fff;
-}
-
-.votes {
-  font-size:1.6em;
-  font-weight:700;
-}
-
-.democrat .votes { color:#2563eb; }
-.republican .votes { color:#dc2626; }
-
-#vote-bar {
-  position:relative;
-  height:36px;
-  background:#333;
-  border-radius:18px;
-  overflow:hidden;
-  flex:1;
-  margin:0 25px;
-}
-
-#democrat-bar, #republican-bar {
-  position:absolute;
-  height:100%;
-  transition:width 0.5s ease;
-}
-
-#democrat-bar { left:0; background:#2563eb; width:0; }
-#republican-bar { right:0; background:#dc2626; width:0; }
-
-#undecided-votes { font-size:1.2em; font-weight:500; margin-top:6px; }
+  align-items:
