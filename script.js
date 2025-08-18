@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     'WY': 'republican',
     'MT': 'republican',
     'OK': 'republican',
-    'AR': 'republican'
+    'AR': 'republican',
     'LA': 'republican',
     'MS': 'republican',
     'AL': 'republican',
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     'IN': 'republican',
     'IL': 'democrat',
     'IA': 'republican',
-    'NE': 'lean-republican'
+    'NE': 'lean-republican',
     'SD': 'republican',
     'ND': 'republican',
     'MN': 'democrat',
