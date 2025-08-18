@@ -1,7 +1,14 @@
 html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; }
 body { font-family: 'Inter', sans-serif; background-color: #000; color: #f0f2f5; text-align: center; }
 
-#map-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+#map-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent; /* removes black box */
+}
 
 /* Overlay for text only; does not block map interactions */
 #ui-overlay {
@@ -11,7 +18,7 @@ body { font-family: 'Inter', sans-serif; background-color: #000; color: #f0f2f5;
     display: flex;
     flex-direction: column;
     gap: 10px;
-    pointer-events: none; /* allows all map interactions */
+    pointer-events: none; /* map receives all mouse/scroll events */
 }
 
 #ui-overlay > * {
