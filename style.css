@@ -4,7 +4,7 @@ html, body {
   width:100%;
   height:100%;
   font-family:'Inter', sans-serif;
-  background:#111;
+  background:#121212;
   color:#fff;
 }
 
@@ -14,12 +14,12 @@ html, body {
   left:0;
   width:100%;
   height:100%;
-  background:#111;
+  background:#121212;
 }
 
 .datamaps-subunit {
   fill:transparent;
-  stroke:#888;
+  stroke:#444;
   stroke-width:1.2;
   transition: fill 0.3s, stroke 0.3s;
 }
@@ -27,26 +27,27 @@ html, body {
 #tooltip {
   position:absolute;
   pointer-events:none;
-  background: rgba(0,0,0,0.85);
+  background: rgba(0,0,0,0.9);
   color:#fff;
-  padding: 8px 12px;
-  border-radius:6px;
+  padding: 10px 15px;
+  border-radius:8px;
   font-size:14px;
   font-weight:600;
   display:none;
+  box-shadow:0 4px 12px rgba(0,0,0,0.5);
   z-index:10;
 }
 
 #results-overlay {
   position:fixed;
-  top:10px;
-  left:50%;
-  transform:translateX(-50%);
+  top:0;
+  left:0;
+  width:100%;
   display:flex;
   flex-direction:column;
   align-items:center;
   gap:15px;
-  width:95%;
+  padding:15px;
   pointer-events:none;
   z-index:10;
 }
@@ -55,7 +56,8 @@ html, body {
   display:flex;
   align-items:center;
   justify-content:space-between;
-  width:100%;
+  width:90%;
+  max-width:1200px;
 }
 
 .candidate {
@@ -66,15 +68,16 @@ html, body {
 }
 
 .candidate img {
-  width:100px;
-  height:100px;
+  width:120px;
+  height:120px;
   border-radius:50%;
   object-fit:cover;
   border:3px solid #fff;
+  box-shadow:0 4px 12px rgba(0,0,0,0.5);
 }
 
 .votes {
-  font-size:1.6em;
+  font-size:1.8em;
   font-weight:700;
 }
 
@@ -83,9 +86,9 @@ html, body {
 
 #vote-bar {
   position:relative;
-  height:36px;
-  background:#333;
-  border-radius:18px;
+  height:42px;
+  background:#222;
+  border-radius:21px;
   overflow:hidden;
   flex:1;
   margin:0 25px;
@@ -94,10 +97,14 @@ html, body {
 #democrat-bar, #republican-bar {
   position:absolute;
   height:100%;
-  transition:width 0.5s ease;
+  transition:width 0.7s ease;
 }
 
 #democrat-bar { left:0; background:#2563eb; width:0; }
 #republican-bar { right:0; background:#dc2626; width:0; }
 
-#undecided-votes { font-size:1.2em; font-weight:500; margin-top:6px; }
+#undecided-votes {
+  font-size:1.3em;
+  font-weight:500;
+  margin-top:6px;
+}
