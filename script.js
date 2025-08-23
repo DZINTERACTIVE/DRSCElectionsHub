@@ -84,8 +84,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Custom centroid for tricky states
   const customCentroids = {
-    'MI': [600, 210]  // middle of Lower Peninsula
-  };
+  'MI': [map.path.centroid({id:'MI'})[0], map.path.centroid({id:'MI'})[1] + 20]
+};
+
 
   // Add state labels + EVs inside states
   map.svg.selectAll('.datamaps-subunit').each(function(d){
