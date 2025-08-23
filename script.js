@@ -1,29 +1,61 @@
-// Add state abbreviations + EVs inside the state
-map.svg.selectAll('.datamaps-subunit').each(function(d){
-  const stateGroup = d3.select(this.parentNode); // the <g> element containing the state path
-  const centroid = map.path.centroid(d);
-  const state = d.id;
-  const ev = electoralVotes[state];
+document.addEventListener('DOMContentLoaded', () => {
+  const electoralVotes = {
+    'AL':9,'AK':3,'AZ':11,'AR':6,'CA':54,'CO':10,'CT':7,'DE':3,'DC':3,'FL':30,'GA':16,'HI':4,'ID':4,'IL':19,
+    'IN':11,'IA':6,'KS':6,'KY':8,'LA':8,'ME':4,'MD':10,'MA':11,'MI':15,'MN':10,'MS':6,'MO':10,'MT':4,'NE':5,
+    'NV':6,'NH':4,'NJ':14,'NM':5,'NY':28,'NC':16,'ND':3,'OH':17,'OK':7,'OR':8,'PA':19,'RI':4,'SC':9,'SD':3,
+    'TN':11,'TX':40,'UT':6,'VT':3,'VA':13,'WA':12,'WV':4,'WI':10,'WY':3
+  };
 
-  // State initials
-  stateGroup.append('text')
-    .attr('x', centroid[0])
-    .attr('y', centroid[1] - 2)
-    .attr('text-anchor','middle')
-    .attr('font-size','12px')
-    .attr('fill','#fff')
-    .attr('pointer-events','none')
-    .attr('class','state-label')
-    .text(state);
+  const electionResults = {
+    'CA':'democrat','NY':'democrat','TX':'republican','FL':'republican','GA':'lean-democrat',
+    'NC':'lean-republican','AZ':'lean-republican','NM':'democrat','CO':'democrat','UT':'republican',
+    'NV':'lean-republican','ID':'republican','WA':'democrat','OR':'democrat','WY':'republican',
+    'MT':'republican','OK':'republican','AR':'republican','LA':'republican','MS':'republican',
+    'AL':'republican','TN':'republican','SC':'republican','KY':'republican','VA':'lean-democrat',
+    'WV':'republican','MD':'democrat','DE':'democrat','NJ':'lean-democrat','PA':'lean-republican',
+    'OH':'republican','IN':'republican','IL':'democrat','IA':'republican','NE':'lean-republican',
+    'SD':'republican','ND':'republican','MN':'democrat','WI':'lean-republican','MI':'lean-republican',
+    'CT':'democrat','RI':'democrat','MA':'democrat','VT':'democrat','NH':'democrat','ME':'lean-democrat',
+    'HI':'democrat','KS':'republican','MO':'republican'
+  };
 
-  // EV number
-  stateGroup.append('text')
-    .attr('x', centroid[0])
-    .attr('y', centroid[1] + 10)
-    .attr('text-anchor','middle')
-    .attr('font-size','10px')
-    .attr('fill','#ff0')
-    .attr('pointer-events','none')
-    .attr('class','state-ev')
-    .text(ev);
-});
+  const totals = { democrat:0, republican:0, undecided:0 };
+  const totalVotes = Object.values(electoralVotes).reduce((a,b)=>a+b,0);
+
+  const mapData = {};
+  for(const state in electoralVotes){
+    const party = electionResults[state] || 'undecided';
+    const mainParty = party.replace('lean-','');
+    if(totals[mainParty]!==undefined) totals[mainParty] += electoralVotes[state];
+    mapData[state] = { fillKey: party.toUpperCase(), votes:electoralVotes[state], party };
+  }
+  totals.undecided = totalVotes - totals.democrat - totals.republican;
+
+  const tooltip = d3.select('body').append('div').attr('id','tooltip');
+
+  const map = new Datamap({
+    element: document.getElementById('map-container'),
+    scope: 'usa',
+    responsive:true,
+    fills:{ 
+      'DEMOCRAT':'#2563eb','REPUBLICAN':'#dc2626',
+      'LEAN-DEMOCRAT':'#93c5fd','LEAN-REPUBLICAN':'#fca5a5',
+      'UNDECIDED':'transparent','defaultFill':'transparent' 
+    },
+    data: mapData,
+    geographyConfig:{
+      borderColor:'#888',
+      highlightFillColor:'#666',
+      highlightBorderColor:'#fff',
+      highlightBorderWidth:2,
+      highlightOnHover:true,
+      popupOnHover:false
+    }
+  });
+
+  map.svg.selectAll('.datamaps-subunit')
+    .on('mouseover', function(d){
+      const state = d.id;
+      const data = mapData[state];
+      tooltip.style('display','block')
+             .html(`<strong>${d.properties.name}</strong> (${state})<br/>
