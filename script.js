@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     'OH':'republican','IN':'republican','IL':'democrat','IA':'republican','NE':'lean-republican',
     'SD':'republican','ND':'republican','MN':'democrat','WI':'lean-republican','MI':'lean-republican',
     'CT':'democrat','RI':'democrat','MA':'democrat','VT':'democrat','NH':'democrat','ME':'lean-democrat',
-    'HI':'democrat','KS':'republican','MO':'republican', 'AK':'republican', 'DC':'democrat'
+    'HI':'democrat','KS':'republican','MO':'republican'
   };
 
   const totals = { democrat:0, republican:0, undecided:0 };
@@ -82,14 +82,19 @@ document.addEventListener('DOMContentLoaded', () => {
     .on('zoom', ()=> map.svg.selectAll('g').attr('transform', `translate(${d3.event.translate})scale(${d3.event.scale})`));
   map.svg.call(zoom);
 
+  // Custom centroid for tricky states
+  const customCentroids = {
+    'MI': [600, 210]  // middle of Lower Peninsula
+  };
+
   // Add state labels + EVs inside states
   map.svg.selectAll('.datamaps-subunit').each(function(d){
     const stateGroup = d3.select(this.parentNode);
-    const centroid = map.path.centroid(d);
+    const centroid = customCentroids[d.id] || map.path.centroid(d);
     const state = d.id;
     const ev = electoralVotes[state];
 
-    if(centroid.some(isNaN)) return; // skip invalid centroids
+    if(centroid.some(isNaN)) return;
 
     stateGroup.append('text')
       .attr('class','state-label')
