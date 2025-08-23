@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     'OH':'republican','IN':'republican','IL':'democrat','IA':'republican','NE':'lean-republican',
     'SD':'republican','ND':'republican','MN':'democrat','WI':'lean-republican','MI':'lean-republican',
     'CT':'democrat','RI':'democrat','MA':'democrat','VT':'democrat','NH':'democrat','ME':'lean-democrat',
-    'HI':'democrat','KS':'republican','MO':'republican', 'AK':'republican', 'DC':'republican'
+    'HI':'democrat','KS':'republican','MO':'republican', 'AK':'republican', 'DC':'democrat'
   };
 
   const totals = { democrat:0, republican:0, undecided:0 };
