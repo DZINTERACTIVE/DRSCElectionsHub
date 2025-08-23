@@ -122,7 +122,7 @@ html, body {
   text-align: center;
 }
 
-/* Modern font for state initials and EVs */
+/* Modern font for state labels and EVs */
 .state-label, .state-ev {
   font-family: 'Oswald', sans-serif;
   font-weight: 700;
