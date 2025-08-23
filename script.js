@@ -82,20 +82,14 @@ document.addEventListener('DOMContentLoaded', () => {
     .on('zoom', ()=> map.svg.selectAll('g').attr('transform', `translate(${d3.event.translate})scale(${d3.event.scale})`));
   map.svg.call(zoom);
 
-  // Custom centroid for tricky states
-  const customCentroids = {
-  'MI': [map.path.centroid({id:'MI'})[0], map.path.centroid({id:'MI'})[1] + 20]
-};
-
-
   // Add state labels + EVs inside states
   map.svg.selectAll('.datamaps-subunit').each(function(d){
     const stateGroup = d3.select(this.parentNode);
-    const centroid = customCentroids[d.id] || map.path.centroid(d);
+    const centroid = map.path.centroid(d);
     const state = d.id;
     const ev = electoralVotes[state];
 
-    if(centroid.some(isNaN)) return;
+    if(centroid.some(isNaN)) return; // skip invalid centroids
 
     stateGroup.append('text')
       .attr('class','state-label')
