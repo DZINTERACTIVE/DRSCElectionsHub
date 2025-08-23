@@ -31,18 +31,18 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   totals.undecided = totalVotes - totals.democrat - totals.republican;
 
-  const tooltip = d3.select('body')
-    .append('div')
-    .attr('id','tooltip');
+  // Tooltip
+  const tooltip = d3.select('body').append('div').attr('id','tooltip');
 
+  // Map
   const map = new Datamap({
     element: document.getElementById('map-container'),
     scope: 'usa',
-    responsive:true,
+    responsive: true,
     fills:{ 
       'DEMOCRAT':'#2563eb','REPUBLICAN':'#dc2626',
       'LEAN-DEMOCRAT':'#93c5fd','LEAN-REPUBLICAN':'#fca5a5',
-      'UNDECIDED':'transparent','defaultFill':'transparent' 
+      'UNDECIDED':'#444','defaultFill':'#444' 
     },
     data: mapData,
     geographyConfig:{
@@ -55,48 +55,56 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Tooltip behavior
   map.svg.selectAll('.datamaps-subunit')
     .on('mouseover', function(d){
       const state = d.id;
       const data = mapData[state];
       tooltip.style('display','block')
-             .html(`<strong>${d.properties.name}</strong> (${state})<br/>
-                    EVs: ${data.votes}<br/>
-                    Party: ${data.party.replace('lean-','').charAt(0).toUpperCase() + 
-                           data.party.replace('lean-','').slice(1)}${data.party.startsWith('lean-')?' (Lean)':''}`);
+        .html(`<strong>${d.properties.name}</strong> (${state})<br/>
+               EVs: ${data.votes}<br/>
+               Party: ${data.party.replace('lean-','').charAt(0).toUpperCase() + 
+               data.party.replace('lean-','').slice(1)}${data.party.startsWith('lean-')?' (Lean)':''}`);
     })
     .on('mousemove', function(){
       tooltip.style('top', (d3.event.pageY + 15) + 'px')
              .style('left', (d3.event.pageX + 15) + 'px');
     })
-    .on('mouseout', function(d){
+    .on('mouseout', function(){
       tooltip.style('display','none');
     });
 
-  // Zoom & pan
+  // Zoom & Pan
   const zoom = d3.behavior.zoom()
-    .scaleExtent([0.5,8])
-    .on('zoom', ()=> map.svg.selectAll('g').attr('transform', `translate(${d3.event.translate})scale(${d3.event.scale})`));
+    .scaleExtent([0.5, 8])
+    .on('zoom', () => {
+      map.svg.select('g').attr('transform',
+        `translate(${d3.event.translate}) scale(${d3.event.scale})`);
+    });
   map.svg.call(zoom);
 
-  // Add state abbreviations + EVs
+  // Add state labels with EV counts
+  const labelsGroup = map.svg.select('g');
   map.svg.selectAll('.datamaps-subunit').each(function(d){
     const centroid = map.path.centroid(d);
-    const state = d.id;
-    const ev = electoralVotes[state];
-    d3.select(map.svg.node().parentNode).append('text')
-      .attr('x', centroid[0])
-      .attr('y', centroid[1]+4)
-      .attr('text-anchor','middle')
-      .attr('font-size','10px')
-      .attr('fill','#fff')
-      .attr('pointer-events','none')
-      .text(`${state} (${ev})`);
+    if(centroid && centroid.length === 2){
+      labelsGroup.append('text')
+        .attr('x', centroid[0])
+        .attr('y', centroid[1]+4)
+        .attr('text-anchor','middle')
+        .attr('font-size','10px')
+        .attr('fill','#fff')
+        .attr('pointer-events','none')
+        .text(`${d.id} (${electoralVotes[d.id]})`);
+    }
   });
 
-  // Update vote bars
-  const demPercent = totals.democrat/538*100;
-  const repPercent = totals.republican/538*100;
-  document.getElementById('democrat-bar').style.width = demPercent + '%';
-  document.getElementById('republican-bar').style.width = repPercent + '%';
+  // Update totals
+  document.getElementById('democrat-votes').textContent = totals.democrat;
+  document.getElementById('republican-votes').textContent = totals.republican;
+  document.getElementById('undecided-votes').textContent = `Undecided: ${totals.undecided}`;
+
+  // Update progress bars
+  document.getElementById('democrat-bar').style.width = `${(totals.democrat/538)*100}%`;
+  document.getElementById('republican-bar').style.width = `${(totals.republican/538)*100}%`;
 });
