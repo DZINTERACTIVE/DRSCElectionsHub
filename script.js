@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     'OH':'republican','IN':'republican','IL':'democrat','IA':'republican','NE':'lean-republican',
     'SD':'republican','ND':'republican','MN':'democrat','WI':'lean-republican','MI':'lean-republican',
     'CT':'democrat','RI':'democrat','MA':'democrat','VT':'democrat','NH':'democrat','ME':'lean-democrat',
-    'HI':'democrat','KS':'republican','MO':'republican', 'AK':'republican', 'DC':'democrat'
+    'HI':'democrat','KS':'republican','MO':'republican'
   };
 
   const totals = { democrat:0, republican:0, undecided:0 };
@@ -30,6 +30,11 @@ document.addEventListener('DOMContentLoaded', () => {
     mapData[state] = { fillKey: party.toUpperCase(), votes:electoralVotes[state], party };
   }
   totals.undecided = totalVotes - totals.democrat - totals.republican;
+
+  // Update vote counts in overlay
+  document.getElementById('democrat-votes').textContent = totals.democrat;
+  document.getElementById('republican-votes').textContent = totals.republican;
+  document.getElementById('undecided-votes').textContent = 'Undecided: ' + totals.undecided;
 
   const tooltip = d3.select('body').append('div').attr('id','tooltip');
 
