@@ -44,8 +44,8 @@ document.addEventListener('DOMContentLoaded', () => {
     fills:{ 
       'DEMOCRAT':'#2563eb',
       'REPUBLICAN':'#dc2626',
-      'LEAN-DEMOCRAT':'#FFD700',
-      'LEAN-REPUBLICAN':'#FFD700',
+      'LEAN-DEMOCRAT':'url(#leanDemPattern)',
+      'LEAN-REPUBLICAN':'url(#leanRepPattern)',
       'UNDECIDED':'transparent',
       'defaultFill':'transparent' 
     },
@@ -60,6 +60,44 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Add patterns for lean states
+  const defs = map.svg.append("defs");
+
+  // Blue stripes for Lean Democrat
+  const leanDem = defs.append("pattern")
+    .attr("id", "leanDemPattern")
+    .attr("patternUnits", "userSpaceOnUse")
+    .attr("width", 6)
+    .attr("height", 6)
+    .attr("patternTransform", "rotate(45)");
+
+  leanDem.append("rect")
+    .attr("width", 6)
+    .attr("height", 6)
+    .attr("fill", "#FFD700"); // yellow base
+  leanDem.append("rect")
+    .attr("width", 3)
+    .attr("height", 6)
+    .attr("fill", "#2563eb"); // blue stripes
+
+  // Red stripes for Lean Republican
+  const leanRep = defs.append("pattern")
+    .attr("id", "leanRepPattern")
+    .attr("patternUnits", "userSpaceOnUse")
+    .attr("width", 6)
+    .attr("height", 6)
+    .attr("patternTransform", "rotate(45)");
+
+  leanRep.append("rect")
+    .attr("width", 6)
+    .attr("height", 6)
+    .attr("fill", "#FFD700"); // yellow base
+  leanRep.append("rect")
+    .attr("width", 3)
+    .attr("height", 6)
+    .attr("fill", "#dc2626"); // red stripes
+
+  // Tooltip hover
   map.svg.selectAll('.datamaps-subunit')
     .on('mouseover', function(d){
       const state = d.id;
@@ -83,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
     .on('zoom', ()=> map.svg.selectAll('g').attr('transform', `translate(${d3.event.translate})scale(${d3.event.scale})`));
   map.svg.call(zoom);
 
-  // Removed state labels block to hide acronyms
+  // Remove state labels to hide acronyms
 
   const demPercent = totals.democrat/538*100;
   const repPercent = totals.republican/538*100;
