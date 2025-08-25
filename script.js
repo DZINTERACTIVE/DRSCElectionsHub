@@ -1,6 +1,23 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const electoralVotes = { /* same as before */ };
-  const electionResults = { /* same as before */ };
+  const electoralVotes = {
+    'AL':9,'AK':3,'AZ':11,'AR':6,'CA':54,'CO':10,'CT':7,'DE':3,'DC':3,'FL':30,'GA':16,'HI':4,'ID':4,'IL':19,
+    'IN':11,'IA':6,'KS':6,'KY':8,'LA':8,'ME':4,'MD':10,'MA':11,'MI':15,'MN':10,'MS':6,'MO':10,'MT':4,'NE':5,
+    'NV':6,'NH':4,'NJ':14,'NM':5,'NY':28,'NC':16,'ND':3,'OH':17,'OK':7,'OR':8,'PA':19,'RI':4,'SC':9,'SD':3,
+    'TN':11,'TX':40,'UT':6,'VT':3,'VA':13,'WA':12,'WV':4,'WI':10,'WY':3
+  };
+
+  const electionResults = {
+    'CA':'democrat','NY':'democrat','TX':'republican','FL':'republican','GA':'lean-democrat',
+    'NC':'lean-republican','AZ':'lean-republican','NM':'democrat','CO':'democrat','UT':'republican',
+    'NV':'lean-republican','ID':'republican','WA':'democrat','OR':'democrat','WY':'republican',
+    'MT':'republican','OK':'republican','AR':'republican','LA':'republican','MS':'republican',
+    'AL':'republican','TN':'republican','SC':'republican','KY':'republican','VA':'lean-democrat',
+    'WV':'republican','MD':'democrat','DE':'democrat','NJ':'lean-democrat','PA':'lean-republican',
+    'OH':'republican','IN':'republican','IL':'democrat','IA':'republican','NE':'lean-republican',
+    'SD':'republican','ND':'republican','MN':'democrat','WI':'lean-republican','MI':'lean-republican',
+    'CT':'democrat','RI':'democrat','MA':'democrat','VT':'democrat','NH':'democrat','ME':'lean-democrat',
+    'HI':'democrat','KS':'republican','MO':'republican','AK':'republican','DC':'democrat'
+  };
 
   const totals = { democrat:0, republican:0, undecided:0 };
   const totalVotes = Object.values(electoralVotes).reduce((a,b)=>a+b,0);
@@ -27,15 +44,14 @@ document.addEventListener('DOMContentLoaded', () => {
     fills:{ 
       'DEMOCRAT':'#2563eb',
       'REPUBLICAN':'#dc2626',
-      'LEAN-DEMOCRAT':'url(#leanDemPattern)',
-      'LEAN-REPUBLICAN':'url(#leanRepPattern)',
-      'UNDECIDED':'transparent',
-      'defaultFill':'transparent' 
+      'LEAN-DEMOCRAT':'#FFD700',
+      'LEAN-REPUBLICAN':'#FFD700',
+      'UNDECIDED':'transparent','defaultFill':'transparent'
     },
     data: mapData,
     geographyConfig:{
       borderColor:'#888',
-      highlightFillColor:'#444',
+      highlightFillColor:'#666',
       highlightBorderColor:'#fff',
       highlightBorderWidth:2,
       highlightOnHover:true,
@@ -43,73 +59,42 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Zoom & pan
+  // Zoom
   const zoom = d3.behavior.zoom()
     .scaleExtent([0.5,8])
     .on('zoom', ()=> map.svg.selectAll('g').attr('transform', `translate(${d3.event.translate})scale(${d3.event.scale})`));
   map.svg.call(zoom);
 
-  // Patterns for lean states
-  const defs = map.svg.append("defs");
-  function createLeanPattern(id, stripeColor){
-    const pattern = defs.append("pattern")
-      .attr("id", id)
-      .attr("patternUnits", "userSpaceOnUse")
-      .attr("width", 8)
-      .attr("height", 8)
-      .attr("patternTransform", "rotate(45)");
-    pattern.append("rect").attr("width", 8).attr("height", 8).attr("fill", "#FFD700");
-    pattern.append("rect").attr("width", 2).attr("height", 8).attr("fill", stripeColor);
-  }
-  createLeanPattern("leanDemPattern", "#2563eb");
-  createLeanPattern("leanRepPattern", "#dc2626");
-
-  // Tooltips + click to load counties
+  // Hover & click
   map.svg.selectAll('.datamaps-subunit')
-    .on('mouseover', function(d){
-      const state = d.id;
-      const data = mapData[state];
-      tooltip.style('display','block')
-             .html(`<strong>${d.properties.name}</strong><br/>
-                    EVs: ${data.votes}<br/>
-                    Party: ${data.party.replace('lean-','').charAt(0).toUpperCase() + 
-                           data.party.replace('lean-','').slice(1)}${data.party.startsWith('lean-')?' (Lean)':''}`);
+    .on('mouseover', d => {
+      const data = mapData[d.id];
+      tooltip.style('display','block').html(`<strong>${d.properties.name}</strong><br/>
+        EVs: ${data.votes}<br/>Party: ${data.party}`);
     })
     .on('mousemove', function(){
       tooltip.style('top', (d3.event.pageY + 15) + 'px')
              .style('left', (d3.event.pageX + 15) + 'px');
     })
-    .on('mouseout', function(){
-      tooltip.style('display','none');
-    })
-    .on('click', function(d){
-      loadCounties(d.id);
-    });
+    .on('mouseout', () => tooltip.style('display','none'))
+    .on('click', d => loadCounties(d.id));
 
-  // Vote bars
   document.getElementById('democrat-bar').style.width = (totals.democrat/538*100)+'%';
   document.getElementById('republican-bar').style.width = (totals.republican/538*100)+'%';
 
-  // -------------------------
-  // Counties overlay
   async function loadCounties(stateId){
     map.svg.selectAll('.datamaps-subunit').transition().duration(200).style('opacity',0.3);
 
-    // Projection for counties
     const projection = d3.geoAlbersUsa().translate([map.options.width/2, map.options.height/2]).scale(map.options.width*1.2);
     const path = d3.geoPath().projection(projection);
 
-    // Load counties TopoJSON
     const countyData = await d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/counties-10m.json');
     const fipsStr = stateFIPS(stateId).toString().padStart(2,'0');
 
     const counties = topojson.feature(countyData, countyData.objects.counties).features
       .filter(c => c.id.toString().startsWith(fipsStr));
 
-    // Remove old counties
     map.svg.selectAll('.county').remove();
-
-    // Create counties <g>
     const g = map.svg.append('g').attr('class','counties');
 
     g.selectAll('.county')
@@ -129,32 +114,18 @@ document.addEventListener('DOMContentLoaded', () => {
       .attr('stroke','#fff')
       .attr('stroke-width',0.5)
       .attr('opacity',0.7)
-      .on('mouseover', function(d){
-        tooltip.style('display','block').html(`County ID: ${d.id}`);
-      })
+      .on('mouseover', d => tooltip.style('display','block').html(`County ID: ${d.id}`))
       .on('mousemove', function(){
         tooltip.style('top', (d3.event.pageY + 15) + 'px')
                .style('left', (d3.event.pageX + 15) + 'px');
       })
-      .on('mouseout', function(){
-        tooltip.style('display','none');
-      });
+      .on('mouseout', () => tooltip.style('display','none'));
 
-    // Back button
     if(!document.getElementById('backBtn')){
       const btn = document.createElement('button');
-      btn.id = 'backBtn';
-      btn.textContent = 'Back to States';
-      btn.style.position = 'absolute';
-      btn.style.top = '10px';
-      btn.style.left = '10px';
-      btn.style.zIndex = '20';
-      btn.style.padding = '6px 12px';
-      btn.style.background = '#333';
-      btn.style.color = '#fff';
-      btn.style.border = 'none';
-      btn.style.borderRadius = '4px';
-      btn.style.cursor = 'pointer';
+      btn.id='backBtn';
+      btn.textContent='Back to States';
+      btn.style.cssText='position:absolute;top:10px;left:10px;z-index:20;padding:6px 12px;background:#333;color:#fff;border:none;border-radius:4px;cursor:pointer;';
       document.body.appendChild(btn);
 
       btn.onclick = () => {
