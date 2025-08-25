@@ -59,7 +59,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Zoom
   const zoom = d3.behavior.zoom()
     .scaleExtent([0.5,8])
     .on('zoom', ()=> map.svg.selectAll('g').attr('transform', `translate(${d3.event.translate})scale(${d3.event.scale})`));
@@ -85,8 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function loadCounties(stateId){
     map.svg.selectAll('.datamaps-subunit').transition().duration(200).style('opacity',0.3);
 
-    const projection = d3.geoAlbersUsa().translate([map.options.width/2, map.options.height/2]).scale(map.options.width*1.2);
-    const path = d3.geoPath().projection(projection);
+    const path = d3.geo.path().projection(map.projection);
 
     const countyData = await d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/counties-10m.json');
     const fipsStr = stateFIPS(stateId).toString().padStart(2,'0');
@@ -123,27 +121,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if(!document.getElementById('backBtn')){
       const btn = document.createElement('button');
-      btn.id='backBtn';
-      btn.textContent='Back to States';
-      btn.style.cssText='position:absolute;top:10px;left:10px;z-index:20;padding:6px 12px;background:#333;color:#fff;border:none;border-radius:4px;cursor:pointer;';
-      document.body.appendChild(btn);
-
+      btn.id = 'backBtn';
+      btn.textContent = 'Back to States';
+      btn.style.position = 'absolute';
+      btn.style.top = '10px';
+      btn.style.left = '10px';
+      btn.style.padding = '8px 12px';
+      btn.style.background = '#333';
+      btn.style.color = '#fff';
+      btn.style.border = 'none';
+      btn.style.cursor = 'pointer';
       btn.onclick = () => {
-        btn.remove();
-        map.svg.selectAll('.counties').remove();
+        map.svg.selectAll('.county').remove();
         map.svg.selectAll('.datamaps-subunit').transition().duration(200).style('opacity',1);
       };
+      document.body.appendChild(btn);
     }
   }
 
-  function stateFIPS(stateId){
-    const fips = {
-      'AL':1,'AK':2,'AZ':4,'AR':5,'CA':6,'CO':8,'CT':9,'DE':10,'DC':11,'FL':12,'GA':13,'HI':15,'ID':16,
-      'IL':17,'IN':18,'IA':19,'KS':20,'KY':21,'LA':22,'ME':23,'MD':24,'MA':25,'MI':26,'MN':27,'MS':28,
-      'MO':29,'MT':30,'NE':31,'NV':32,'NH':33,'NJ':34,'NM':35,'NY':36,'NC':37,'ND':38,'OH':39,'OK':40,
-      'OR':41,'PA':42,'RI':44,'SC':45,'SD':46,'TN':47,'TX':48,'UT':49,'VT':50,'VA':51,'WA':53,'WV':54,
-      'WI':55,'WY':56
+  // Map state abbreviation -> FIPS
+  function stateFIPS(state){
+    const mapping = {
+      'AL':1,'AK':2,'AZ':4,'AR':5,'CA':6,'CO':8,'CT':9,'DE':10,'DC':11,'FL':12,'GA':13,'HI':15,'ID':16,'IL':17,
+      'IN':18,'IA':19,'KS':20,'KY':21,'LA':22,'ME':23,'MD':24,'MA':25,'MI':26,'MN':27,'MS':28,'MO':29,'MT':30,
+      'NE':31,'NV':32,'NH':33,'NJ':34,'NM':35,'NY':36,'NC':37,'ND':38,'OH':39,'OK':40,'OR':41,'PA':42,'RI':44,
+      'SC':45,'SD':46,'TN':47,'TX':48,'UT':49,'VT':50,'VA':51,'WA':53,'WV':54,'WI':55,'WY':56
     };
-    return fips[stateId];
+    return mapping[state];
   }
 });
