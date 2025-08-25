@@ -1,6 +1,23 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const electoralVotes = { /* same as before */ };
-  const electionResults = { /* same as before */ };
+  const electoralVotes = {
+    'AL':9,'AK':3,'AZ':11,'AR':6,'CA':54,'CO':10,'CT':7,'DE':3,'DC':3,'FL':30,'GA':16,'HI':4,'ID':4,'IL':19,
+    'IN':11,'IA':6,'KS':6,'KY':8,'LA':8,'ME':4,'MD':10,'MA':11,'MI':15,'MN':10,'MS':6,'MO':10,'MT':4,'NE':5,
+    'NV':6,'NH':4,'NJ':14,'NM':5,'NY':28,'NC':16,'ND':3,'OH':17,'OK':7,'OR':8,'PA':19,'RI':4,'SC':9,'SD':3,
+    'TN':11,'TX':40,'UT':6,'VT':3,'VA':13,'WA':12,'WV':4,'WI':10,'WY':3
+  };
+
+  const electionResults = {
+    'CA':'democrat','NY':'democrat','TX':'republican','FL':'republican','GA':'lean-democrat',
+    'NC':'lean-republican','AZ':'lean-republican','NM':'democrat','CO':'democrat','UT':'republican',
+    'NV':'lean-republican','ID':'republican','WA':'democrat','OR':'democrat','WY':'republican',
+    'MT':'republican','OK':'republican','AR':'republican','LA':'republican','MS':'republican',
+    'AL':'republican','TN':'republican','SC':'republican','KY':'republican','VA':'lean-democrat',
+    'WV':'republican','MD':'democrat','DE':'democrat','NJ':'lean-democrat','PA':'lean-republican',
+    'OH':'republican','IN':'republican','IL':'democrat','IA':'republican','NE':'lean-republican',
+    'SD':'republican','ND':'republican','MN':'democrat','WI':'lean-republican','MI':'lean-republican',
+    'CT':'democrat','RI':'democrat','MA':'democrat','VT':'democrat','NH':'democrat','ME':'lean-democrat',
+    'HI':'democrat','KS':'republican','MO':'republican', 'AK':'republican', 'DC':'democrat'
+  };
 
   const totals = { democrat:0, republican:0, undecided:0 };
   const totalVotes = Object.values(electoralVotes).reduce((a,b)=>a+b,0);
@@ -20,7 +37,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const tooltip = d3.select('body').append('div').attr('id','tooltip');
 
-  // Initial US Map
   const map = new Datamap({
     element: document.getElementById('map-container'),
     scope: 'usa',
@@ -45,11 +61,12 @@ document.addEventListener('DOMContentLoaded', () => {
     done: function(datamap) {
       datamap.svg.selectAll('.datamaps-subunit')
         .on('click', function(d){
-          loadCounties(d.id); // Load counties of clicked state
+          loadCounties(d.id);
         });
     }
   });
 
+  // Patterns for lean states
   const defs = map.svg.append("defs");
 
   function createLeanPattern(id, stripeColor){
@@ -61,12 +78,12 @@ document.addEventListener('DOMContentLoaded', () => {
       .attr("patternTransform", "rotate(45)");
     pattern.append("rect").attr("width", 8).attr("height", 8).attr("fill", "#FFD700");
     pattern.append("rect").attr("width", 2).attr("height", 8).attr("fill", stripeColor);
-    return pattern;
   }
 
   createLeanPattern("leanDemPattern", "#2563eb");
   createLeanPattern("leanRepPattern", "#dc2626");
 
+  // State hover tooltips
   map.svg.selectAll('.datamaps-subunit')
     .on('mouseover', function(d){
       const state = d.id;
@@ -93,57 +110,53 @@ document.addEventListener('DOMContentLoaded', () => {
     .on('zoom', ()=> map.svg.selectAll('g').attr('transform', `translate(${d3.event.translate})scale(${d3.event.scale})`));
   map.svg.call(zoom);
 
+  // Vote bars
   const demPercent = totals.democrat/538*100;
   const repPercent = totals.republican/538*100;
   document.getElementById('democrat-bar').style.width = demPercent + '%';
   document.getElementById('republican-bar').style.width = repPercent + '%';
 
-  // ---- Counties Layer ----
-  async function loadCounties(stateId){
-    // Hide US states layer
-    map.svg.selectAll('.datamaps-subunit').style('display','none');
+  // -------------------------
+  // Counties on click
+  async function loadCounties(stateId) {
+    // Hide states
+    map.svg.selectAll('.datamaps-subunit').style('opacity', 0);
 
+    // Load county TopoJSON
     const countyData = await d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/counties-10m.json');
-
     const counties = topojson.feature(countyData, countyData.objects.counties).features
       .filter(c => Math.floor(c.id / 1000) === parseInt(stateFIPS(stateId)));
 
-    // assign fake lean/random party for simulation
-    const countyMap = {};
-    counties.forEach(c => {
-      // Randomized lean based on state lean
-      const stateParty = (mapData[stateId]?.party || 'undecided');
-      let lean = stateParty.includes('lean') ? stateParty : Math.random() > 0.5 ? 'democrat' : 'republican';
-      countyMap[c.id] = { fillKey: lean.toUpperCase(), votes: 1, party: lean };
-    });
+    // Remove old counties
+    map.svg.selectAll('.county').remove();
 
-    const countyMapObj = new Datamap({
-      element: document.getElementById('map-container'),
-      scope: 'usa',
-      done: map => {},
-      geographyConfig: {
-        borderColor:'#888',
-        highlightFillColor:'#444',
-        highlightBorderColor:'#fff',
-        highlightBorderWidth:1,
-        highlightOnHover:true,
-        popupOnHover:false
-      },
-      fills:{
-        'DEMOCRAT':'#2563eb',
-        'REPUBLICAN':'#dc2626',
-        'LEAN-DEMOCRAT':'url(#leanDemPattern)',
-        'LEAN-REPUBLICAN':'url(#leanRepPattern)',
-        'UNDECIDED':'transparent',
-        'defaultFill':'transparent'
-      },
-      data: countyMap,
-      setProjection: function(element){
-        const projection = d3.geoAlbersUsa().translate([element.offsetWidth/2, element.offsetHeight/2]).scale(element.offsetWidth*1.2);
-        const path = d3.geoPath().projection(projection);
-        return {path: path, projection: projection};
-      }
-    });
+    // Append counties
+    map.svg.selectAll('.county')
+      .data(counties)
+      .enter()
+      .append('path')
+      .attr('class','county')
+      .attr('d', map.path)
+      .attr('fill', d => {
+        const stateParty = (mapData[stateId]?.party || 'undecided');
+        if(stateParty.includes('lean')){
+          return stateParty.includes('dem') ? 'url(#leanDemPattern)' : 'url(#leanRepPattern)';
+        }
+        return stateParty === 'democrat' ? '#2563eb' : stateParty === 'republican' ? '#dc2626' : 'transparent';
+      })
+      .attr('stroke','#888')
+      .attr('stroke-width',0.8)
+      .on('mouseover', function(d){
+        tooltip.style('display','block')
+               .html(`County ID: ${d.id}`);
+      })
+      .on('mousemove', function(){
+        tooltip.style('top', (d3.event.pageY + 15) + 'px')
+               .style('left', (d3.event.pageX + 15) + 'px');
+      })
+      .on('mouseout', function(){
+        tooltip.style('display','none');
+      });
 
     // Back button
     if(!document.getElementById('backBtn')){
@@ -164,14 +177,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
       btn.onclick = () => {
         btn.remove();
-        map.svg.selectAll('.datamaps-subunit').style('display','block');
-        document.getElementById('map-container').innerHTML = '';
-        map.render(); // re-render states
+        map.svg.selectAll('.county').remove();
+        map.svg.selectAll('.datamaps-subunit').style('opacity', 1);
       };
     }
   }
 
-  // Helper FIPS mapping for states
+  // -------------------------
+  // State FIPS helper
   function stateFIPS(stateId){
     const fips = {
       'AL':1,'AK':2,'AZ':4,'AR':5,'CA':6,'CO':8,'CT':9,'DE':10,'DC':11,'FL':12,'GA':13,'HI':15,'ID':16,
@@ -182,4 +195,5 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     return fips[stateId];
   }
+
 });
