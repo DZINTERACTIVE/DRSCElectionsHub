@@ -31,7 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   totals.undecided = totalVotes - totals.democrat - totals.republican;
 
-  // Update vote counts in overlay
   document.getElementById('democrat-votes').textContent = totals.democrat;
   document.getElementById('republican-votes').textContent = totals.republican;
   document.getElementById('undecided-votes').textContent = 'Undecided: ' + totals.undecided;
@@ -43,9 +42,12 @@ document.addEventListener('DOMContentLoaded', () => {
     scope: 'usa',
     responsive:true,
     fills:{ 
-      'DEMOCRAT':'#2563eb','REPUBLICAN':'#dc2626',
-      'LEAN-DEMOCRAT':'#93c5fd','LEAN-REPUBLICAN':'#fca5a5',
-      'UNDECIDED':'transparent','defaultFill':'transparent' 
+      'DEMOCRAT':'#2563eb',
+      'REPUBLICAN':'#dc2626',
+      'LEAN-DEMOCRAT':'#FFD700',
+      'LEAN-REPUBLICAN':'#FFD700',
+      'UNDECIDED':'transparent',
+      'defaultFill':'transparent' 
     },
     data: mapData,
     geographyConfig:{
@@ -63,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const state = d.id;
       const data = mapData[state];
       tooltip.style('display','block')
-             .html(`<strong>${d.properties.name}</strong> (${state})<br/>
+             .html(`<strong>${d.properties.name}</strong><br/>
                     EVs: ${data.votes}<br/>
                     Party: ${data.party.replace('lean-','').charAt(0).toUpperCase() + 
                            data.party.replace('lean-','').slice(1)}${data.party.startsWith('lean-')?' (Lean)':''}`);
@@ -76,35 +78,13 @@ document.addEventListener('DOMContentLoaded', () => {
       tooltip.style('display','none');
     });
 
-  // Zoom & pan
   const zoom = d3.behavior.zoom()
     .scaleExtent([0.5,8])
     .on('zoom', ()=> map.svg.selectAll('g').attr('transform', `translate(${d3.event.translate})scale(${d3.event.scale})`));
   map.svg.call(zoom);
 
-  // Add state labels + EVs inside states
-  map.svg.selectAll('.datamaps-subunit').each(function(d){
-    const stateGroup = d3.select(this.parentNode);
-    const centroid = map.path.centroid(d);
-    const state = d.id;
-    const ev = electoralVotes[state];
+  // Removed state labels block to hide acronyms
 
-    if(centroid.some(isNaN)) return; // skip invalid centroids
-
-    stateGroup.append('text')
-      .attr('class','state-label')
-      .attr('x', centroid[0])
-      .attr('y', centroid[1]-2)
-      .text(state);
-
-    stateGroup.append('text')
-      .attr('class','state-ev')
-      .attr('x', centroid[0])
-      .attr('y', centroid[1]+10)
-      .text(ev);
-  });
-
-  // Update vote bars
   const demPercent = totals.democrat/538*100;
   const repPercent = totals.republican/538*100;
   document.getElementById('democrat-bar').style.width = demPercent + '%';
