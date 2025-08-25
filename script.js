@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   totals.undecided = totalVotes - totals.democrat - totals.republican;
 
+  // Vote counts
   document.getElementById('democrat-votes').textContent = totals.democrat;
   document.getElementById('republican-votes').textContent = totals.republican;
   document.getElementById('undecided-votes').textContent = 'Undecided: ' + totals.undecided;
@@ -83,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
   createLeanPattern("leanDemPattern", "#2563eb");
   createLeanPattern("leanRepPattern", "#dc2626");
 
-  // State hover tooltips
+  // Tooltips
   map.svg.selectAll('.datamaps-subunit')
     .on('mouseover', function(d){
       const state = d.id;
@@ -93,7 +94,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     EVs: ${data.votes}<br/>
                     Party: ${data.party.replace('lean-','').charAt(0).toUpperCase() + 
                            data.party.replace('lean-','').slice(1)}${data.party.startsWith('lean-')?' (Lean)':''}`);
-      d3.select(this).transition().duration(200).style("fill-opacity", 0.8);
     })
     .on('mousemove', function(){
       tooltip.style('top', (d3.event.pageY + 15) + 'px')
@@ -101,7 +101,6 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     .on('mouseout', function(d){
       tooltip.style('display','none');
-      d3.select(this).transition().duration(200).style("fill-opacity", 1);
     });
 
   // Zoom & pan
@@ -111,18 +110,16 @@ document.addEventListener('DOMContentLoaded', () => {
   map.svg.call(zoom);
 
   // Vote bars
-  const demPercent = totals.democrat/538*100;
-  const repPercent = totals.republican/538*100;
-  document.getElementById('democrat-bar').style.width = demPercent + '%';
-  document.getElementById('republican-bar').style.width = repPercent + '%';
+  document.getElementById('democrat-bar').style.width = (totals.democrat/538*100)+'%';
+  document.getElementById('republican-bar').style.width = (totals.republican/538*100)+'%';
 
   // -------------------------
   // Counties on click
   async function loadCounties(stateId) {
-    // Hide states
-    map.svg.selectAll('.datamaps-subunit').style('opacity', 0);
+    // Fade states
+    map.svg.selectAll('.datamaps-subunit').transition().duration(200).style('opacity', 0.3);
 
-    // Load county TopoJSON
+    // Load counties TopoJSON
     const countyData = await d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/counties-10m.json');
     const counties = topojson.feature(countyData, countyData.objects.counties).features
       .filter(c => Math.floor(c.id / 1000) === parseInt(stateFIPS(stateId)));
@@ -131,21 +128,24 @@ document.addEventListener('DOMContentLoaded', () => {
     map.svg.selectAll('.county').remove();
 
     // Append counties
-    map.svg.selectAll('.county')
+    map.svg.select('g')
+      .selectAll('.county')
       .data(counties)
       .enter()
       .append('path')
-      .attr('class','county')
-      .attr('d', map.path)
+      .attr('class', 'county')
+      .attr('d', d3.geoPath().projection(map.projection))
       .attr('fill', d => {
-        const stateParty = (mapData[stateId]?.party || 'undecided');
-        if(stateParty.includes('lean')){
-          return stateParty.includes('dem') ? 'url(#leanDemPattern)' : 'url(#leanRepPattern)';
+        const stateParty = mapData[stateId]?.party || 'undecided';
+        if(stateParty.startsWith('lean')){
+          // Randomize some counties for swing effect
+          return Math.random() < 0.5 ? '#2563eb' : '#dc2626';
         }
-        return stateParty === 'democrat' ? '#2563eb' : stateParty === 'republican' ? '#dc2626' : 'transparent';
+        return stateParty === 'democrat' ? '#2563eb' :
+               stateParty === 'republican' ? '#dc2626' : 'transparent';
       })
       .attr('stroke','#888')
-      .attr('stroke-width',0.8)
+      .attr('stroke-width',0.6)
       .on('mouseover', function(d){
         tooltip.style('display','block')
                .html(`County ID: ${d.id}`);
@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.onclick = () => {
         btn.remove();
         map.svg.selectAll('.county').remove();
-        map.svg.selectAll('.datamaps-subunit').style('opacity', 1);
+        map.svg.selectAll('.datamaps-subunit').transition().duration(200).style('opacity', 1);
       };
     }
   }
