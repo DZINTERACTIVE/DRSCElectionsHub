@@ -121,14 +121,3 @@ html, body {
   font-weight: 600;
   text-align: center;
 }
-
-/* Modern font for state labels and EVs */
-.state-label, .state-ev {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 600;
-  pointer-events: none;
-  text-anchor: middle;
-  fill: white;
-}
-.state-ev { fill: #ff0; font-size: 10px; }
-.state-label { font-size: 12px; }
